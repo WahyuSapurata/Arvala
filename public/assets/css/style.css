@@ -475,6 +475,11 @@ th[rowspan] {
     box-shadow: none;
 }
 
+.btn-shop-custom.btn.btn-primary:hover:not(.btn-active) {
+    background-color: transparent !important;
+    color: #151a30;
+}
+
 @media (max-width: 768px) {
     .custom-card {
         border-radius: 20px;

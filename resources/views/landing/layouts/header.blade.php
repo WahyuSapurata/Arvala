@@ -87,9 +87,10 @@
                         <!--begin::Menu item-->
                         <div class="menu-item d-flex d-md-none d-lg-none">
                             <!--begin::Menu link-->
-                            <a href="{{ route('shop') }}" class="btn btn-primary rounded-pill"
+                            <a href="{{ route('shop') }}" class="btn-shop-custom btn btn-primary rounded-pill"
                                 style="font-size: 16px; font-weight: 500;">
-                                Shop <i class="bi bi-bag p-0 ms-3" style="font-size: 30px; margin-right: -10px"></i>
+                                Shop <i class="bi bi-bag ms-2 p-2 bg-white text-dark rounded-circle"
+                                    style="font-size: 16px; margin-right: -10px"></i>
                             </a>
                             <!--end::Menu link-->
                         </div>
@@ -101,10 +102,11 @@
             <!--end::Menu wrapper-->
             <!--begin::Toolbar-->
             <div class="d-none d-md-flex justify-content-end align-items-center">
-                <a href="{{ route('shop') }}" class="btn btn-primary fw-bolder rounded-pill d-flex align-items-center"
+                <a href="{{ route('shop') }}"
+                    class="btn-shop-custom btn btn-primary fw-bolder rounded-pill d-flex align-items-center"
                     style="font-size: 16px; font-weight: 500;">
                     Shop
-                    <i class="bi bi-bag ms-2 p-2 bg-white text-primary rounded-circle"
+                    <i class="bi bi-bag ms-2 p-2 bg-white text-dark rounded-circle"
                         style="font-size: 16px; margin-right: -10px"></i>
                 </a>
             </div>
