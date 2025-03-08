@@ -22,6 +22,7 @@
     <meta property="og:image" content="https://arvalamockup.com/logo_arvala.png" />
     <meta property="og:image:alt" content="Kilq Mockup Preview" />
     <link rel="canonical" href="https://arvalamockup.com/" />
+    <meta name="google-site-verification" content="FnO2dJiuVYaHHdnvK8oXap9nXg8FuI7ayeh6i1J7nEE" />
     <link rel="shortcut icon" href="{{ asset('FAV ICOn.png') }}" />
     <!--begin::Fonts-->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700" />
