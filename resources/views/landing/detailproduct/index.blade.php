@@ -57,13 +57,13 @@
                             <a href="{{ $data->link }}" target="_blank"
                                 class="btn btn-primary rounded-pill text-white fw-bolder">{{ $data->price }}
                                 Buy Now</a>
-                            <a href="{{ $data->link }}" target="_blank"
+                            {{-- <a href="{{ $data->link }}" target="_blank"
                                 class="btn rounded-pill text-dark fw-bolder">Preview
-                                in browser <i class="bi bi-arrow-right-short fw-bold fs-1"></i></a>
+                                in browser <i class="bi bi-arrow-right-short fw-bold fs-1"></i></a> --}}
                         </div>
                     </div>
 
-                    <div class="p-10 mb-8" style="background-color: #F2F4F7; border-radius: 32px">
+                    {{-- <div class="p-10 mb-8" style="background-color: #F2F4F7; border-radius: 32px">
                         <h2 class="text-dark" id="how-it-works" data-kt-scroll-offset="{default: 100, lg: 150}">
                             Information</h2>
                         <ul class="list-group">
@@ -80,9 +80,9 @@
                                 <span>Last update</span> <span>11 Nov 2088</span>
                             </li>
                         </ul>
-                    </div>
+                    </div> --}}
 
-                    <div class="p-10 mb-8" style="background-color: #111111; border-radius: 32px">
+                    {{-- <div class="p-10 mb-8" style="background-color: #111111; border-radius: 32px">
                         <h1 class="text-white fs-2qx" id="how-it-works" data-kt-scroll-offset="{default: 100, lg: 150}">
                             Pro Access</h1>
                         <div class="fs-lg-6 text-white mb-3">
@@ -92,7 +92,7 @@
                         <div class="d-grid">
                             <a href="" class="btn btn-primary rounded-pill text-white fw-bolder">Subscribe</a>
                         </div>
-                    </div>
+                    </div> --}}
                 </div>
             </div>
         </div>
