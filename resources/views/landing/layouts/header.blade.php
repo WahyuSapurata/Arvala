@@ -58,13 +58,13 @@
                         </div>
                         <!--end::Menu item-->
                         <!--begin::Menu item-->
-                        <div class="menu-item">
+                        {{-- <div class="menu-item">
                             <!--begin::Menu link-->
                             <a class="menu-link nav-link py-3 px-4 px-xxl-6 {{ Request::is('shop') ? 'active' : '' }}"
                                 href="{{ route('shop') }}" data-kt-scroll-toggle="true"
                                 data-kt-drawer-dismiss="true">Shop</a>
                             <!--end::Menu link-->
-                        </div>
+                        </div> --}}
                         <!--end::Menu item-->
                         <!--begin::Menu item-->
                         <div class="menu-item">
@@ -78,20 +78,18 @@
                         <!--begin::Menu item-->
                         <div class="menu-item">
                             <!--begin::Menu link-->
-                            <a class="menu-link nav-link py-3 px-4 px-xxl-6 {{ Request::is('contact') ? 'active' : '' }}"
-                                href="{{ route('contact') }}" data-kt-scroll-toggle="true"
-                                data-kt-drawer-dismiss="true">Contact</a>
+                            <a class="menu-link nav-link py-3 px-4 px-xxl-6 {{ Request::is('faqs') ? 'active' : '' }}"
+                                href="{{ route('faqs') }}" data-kt-scroll-toggle="true"
+                                data-kt-drawer-dismiss="true">FAQs</a>
                             <!--end::Menu link-->
                         </div>
                         <!--end::Menu item-->
                         <!--begin::Menu item-->
                         <div class="menu-item d-flex d-md-none d-lg-none">
                             <!--begin::Menu link-->
-                            <a href="https://clonify.lemonsqueezy.com/checkout/buy/ea2f2929-ca5e-4916-9002-09ea7411ae0a"
-                                target="_blank" class="btn btn-primary rounded-pill"
+                            <a href="{{ route('shop') }}" class="btn btn-primary rounded-pill"
                                 style="font-size: 16px; font-weight: 500;">
-                                Contact <i class="bi bi-arrow-right-circle-fill p-0 ms-3"
-                                    style="font-size: 30px; margin-right: -10px"></i>
+                                Shop <i class="bi bi-bag p-0 ms-3" style="font-size: 30px; margin-right: -10px"></i>
                             </a>
                             <!--end::Menu link-->
                         </div>
@@ -103,11 +101,11 @@
             <!--end::Menu wrapper-->
             <!--begin::Toolbar-->
             <div class="d-none d-md-flex justify-content-end align-items-center">
-                <a href="https://clonify.lemonsqueezy.com/checkout/buy/ea2f2929-ca5e-4916-9002-09ea7411ae0a"
-                    target="_blank" class="btn btn-primary rounded-pill d-flex align-items-center"
+                <a href="{{ route('shop') }}" class="btn btn-primary fw-bolder rounded-pill d-flex align-items-center"
                     style="font-size: 16px; font-weight: 500;">
-                    Contact
-                    <i class="bi bi-arrow-right-circle-fill ms-2" style="font-size: 24px; margin-right: -10px"></i>
+                    Shop
+                    <i class="bi bi-bag ms-2 p-2 bg-white text-primary rounded-circle"
+                        style="font-size: 16px; margin-right: -10px"></i>
                 </a>
             </div>
 

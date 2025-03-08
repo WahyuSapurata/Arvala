@@ -56,9 +56,9 @@ class Landing extends BaseController
         return view('landing.about.index', compact('module'));
     }
 
-    public function contact()
+    public function faqs()
     {
-        $module = 'Contact';
-        return view('landing.contact.index', compact('module'));
+        $module = 'FAQs';
+        return view('landing.faqs.index', compact('module'));
     }
 }

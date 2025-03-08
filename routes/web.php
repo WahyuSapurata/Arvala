@@ -24,7 +24,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
 
     Route::get('/about', 'Landing@about')->name('about');
 
-    Route::get('/contact', 'Landing@contact')->name('contact');
+    Route::get('/faqs', 'Landing@faqs')->name('faqs');
 
     Route::group(['prefix' => 'login', 'middleware' => ['guest'], 'as' => 'login.'], function () {
         Route::get('/login-akun', 'Auth@show')->name('login-akun');

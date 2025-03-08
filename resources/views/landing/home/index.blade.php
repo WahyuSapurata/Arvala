@@ -3,7 +3,7 @@
     <div class="container">
         <div class="w-100 py-10">
             <img src="{{ asset('bg-default.png') }}" class="w-100 backgriund-landing d-none d-md-block" loading="lazy"
-                style="height: 100%%" alt="">
+                style="height: 100%" alt="">
             <img src="{{ asset('bg-mobile.png') }}" class="w-100 backgriund-landing d-block d-md-none" loading="lazy"
                 style="height: 100%" alt="">
         </div>
@@ -19,7 +19,8 @@
                 <!--begin::Title-->
                 <h3 class="text-dark" id="how-it-works" data-kt-scroll-offset="{default: 100, lg: 150}">
                     Latest Mockup</h3>
-                <a href="" class="btn btn-view-custom">View More <i class="bi bi-arrow-right fs-4 ms-3"></i></a>
+                <a href="{{ route('shop') }}" class="btn btn-view-custom">View More <i
+                        class="bi bi-arrow-right fs-4 ms-3"></i></a>
                 <!--end::Title-->
             </div>
             <!--end::Heading-->
@@ -79,7 +80,8 @@
                 <!--begin::Title-->
                 <h3 class="text-dark" id="how-it-works" data-kt-scroll-offset="{default: 100, lg: 150}">
                     More Mockup</h3>
-                <a href="" class="btn btn-view-custom">View More <i class="bi bi-arrow-right fs-4 ms-3"></i></a>
+                <a href="{{ route('shop') }}" class="btn btn-view-custom">View More <i
+                        class="bi bi-arrow-right fs-4 ms-3"></i></a>
                 <!--end::Title-->
             </div>
             <!--end::Heading-->

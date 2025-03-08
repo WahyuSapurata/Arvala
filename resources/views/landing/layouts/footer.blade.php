@@ -48,7 +48,7 @@
                             <h4 class="fw-bolder mb-6" style="color: #2D2D2D">Resources</h4>
                             <!--end::Subtitle-->
                             <!--begin::Link-->
-                            <a href="" class="text-hover-primary fs-5 mb-6" style="color: #585858">FAQs</a>
+                            <a href="" class="text-hover-primary fs-5 mb-6" style="color: #585858">Contact</a>
                             <!--end::Link-->
                             <!--begin::Link-->
                             <a href="" class="text-hover-primary fs-5 mb-6" style="color: #585858">License
