@@ -9,11 +9,22 @@
     <meta charset="utf-8" />
     <title> {{ config('app.name') . ' | ' . $module }} </title>
     <meta name="description"
-        content="Si Peka (Sistem Informasi Pengetesan Kemiskinan) Adalah Wadah Perencanaan, Monitoring Pelakasanaan dan Evaluasi Kinerja Program Pengetesan Kemiskinan Terintegrasi Dengan Konsep Kolaborasi Program dan Anggaran." />
-    <meta name="keywords" content="Kemiskinan, perencanaan,monitoring, evaluasi" />
+        content="Kilq is a dynamic product mockup template designed to help creators and entrepreneurs showcase their digital products with professional, high-quality mockups. Perfect for selling and presenting digital goods in a visually appealing way.">
+    <meta name="keywords"
+        content="product mockup template, digital product mockup, marketplace mockup design, sell mockup templates, professional product mockups, digital goods mockup, mockup for creators, product presentation template, high-quality mockup designs, downloadable mockup templates, creative product mockups, mockup marketplace template, sell digital mockups, product display templates, mockup design for entrepreneurs, digital asset mockups, customizable mockup templates, premium mockup designs, mockup for digital products, product visualization templates">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="shortcut icon" href="{{ asset('FAV ICOn.png') }}" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Kilq - Professional Product Mockup Template for Digital Goods" />
+    <meta property="og:description"
+        content="Kilq is a dynamic product mockup template designed to help creators and entrepreneurs showcase their digital products with professional, high-quality mockups. Perfect for selling and presenting digital goods in a visually appealing way." />
+    <meta property="og:url" content="https://arvalamockup.com/" />
+    <meta property="og:site_name" content="Kilq Mockup" />
+    <meta property="og:image" content="https://arvalamockup.com/logo_arvala.png" />
+    <meta property="og:image:alt" content="Kilq Mockup Preview" />
+    <link rel="canonical" href="https://arvalamockup.com/" />
     <!--begin::Fonts-->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
