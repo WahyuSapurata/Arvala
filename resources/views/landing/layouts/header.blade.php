@@ -69,7 +69,8 @@
                         <!--begin::Menu item-->
                         <div class="menu-item">
                             <!--begin::Menu link-->
-                            <a class="menu-link nav-link py-3 px-4 px-xxl-6" href="" data-kt-scroll-toggle="true"
+                            <a class="menu-link nav-link py-3 px-4 px-xxl-6 {{ Request::is('about') ? 'active' : '' }}"
+                                href="{{ route('about') }}" data-kt-scroll-toggle="true"
                                 data-kt-drawer-dismiss="true">About</a>
                             <!--end::Menu link-->
                         </div>
@@ -77,7 +78,8 @@
                         <!--begin::Menu item-->
                         <div class="menu-item">
                             <!--begin::Menu link-->
-                            <a class="menu-link nav-link py-3 px-4 px-xxl-6" href="" data-kt-scroll-toggle="true"
+                            <a class="menu-link nav-link py-3 px-4 px-xxl-6 {{ Request::is('contact') ? 'active' : '' }}"
+                                href="{{ route('contact') }}" data-kt-scroll-toggle="true"
                                 data-kt-drawer-dismiss="true">Contact</a>
                             <!--end::Menu link-->
                         </div>

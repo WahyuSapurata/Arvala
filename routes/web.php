@@ -22,6 +22,10 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
 
     Route::get('/shop', 'Landing@shop')->name('shop');
 
+    Route::get('/about', 'Landing@about')->name('about');
+
+    Route::get('/contact', 'Landing@contact')->name('contact');
+
     Route::group(['prefix' => 'login', 'middleware' => ['guest'], 'as' => 'login.'], function () {
         Route::get('/login-akun', 'Auth@show')->name('login-akun');
         Route::post('/login-proses', 'Auth@login_proses')->name('login-proses');

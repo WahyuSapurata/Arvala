@@ -49,4 +49,16 @@ class Landing extends BaseController
 
         return view('landing.shop.index', compact('module', 'data_kategori', 'product'));
     }
+
+    public function about()
+    {
+        $module = 'About';
+        return view('landing.about.index', compact('module'));
+    }
+
+    public function contact()
+    {
+        $module = 'Contact';
+        return view('landing.contact.index', compact('module'));
+    }
 }
