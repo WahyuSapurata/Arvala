@@ -8,8 +8,8 @@
     <base href="">
     <meta charset="utf-8" />
     <title> {{ config('app.name') . ' | ' . $module }} </title>
-    <meta name="description"
-        content="Kilq is a dynamic product mockup template designed to help creators and entrepreneurs showcase their digital products with professional, high-quality mockups. Perfect for selling and presenting digital goods in a visually appealing way.">
+    <meta property="og:description"
+        content="Arvala Mockup is a professional product mockup template designed for digital goods. Perfect for creators and entrepreneurs." />
     <meta name="keywords"
         content="product mockup template, digital product mockup, marketplace mockup design, sell mockup templates, professional product mockups, digital goods mockup, mockup for creators, product presentation template, high-quality mockup designs, downloadable mockup templates, creative product mockups, mockup marketplace template, sell digital mockups, product display templates, mockup design for entrepreneurs, digital asset mockups, customizable mockup templates, premium mockup designs, mockup for digital products, product visualization templates">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
