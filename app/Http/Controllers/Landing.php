@@ -45,6 +45,8 @@ class Landing extends BaseController
         $product = Product::when($request->search, function ($query) use ($request) {
             $query->where('meta', 'like', '%' . $request->search . '%');
         })
+            ->join('kategoris', 'products.uuid_kategori', '=', 'kategoris.uuid')
+            ->select('products.*', 'kategoris.nama_kategori as kategori')
             ->paginate(6);
 
         return view('landing.shop.index', compact('module', 'data_kategori', 'product'));
