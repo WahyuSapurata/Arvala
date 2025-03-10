@@ -30,7 +30,6 @@ class StoreProductRequest extends FormRequest
             'detail_1' => 'required',
             'detail_2' => 'required',
             'detail_3' => 'required',
-            'detail_4' => 'required',
             'meta' => 'required',
             'link' => 'required',
         ];
@@ -47,7 +46,6 @@ class StoreProductRequest extends FormRequest
             'detail_1.required' => 'Kolom detail image 1 harus di isi.',
             'detail_2.required' => 'Kolom detail image 2 harus di isi.',
             'detail_3.required' => 'Kolom detail image 3 harus di isi.',
-            'detail_4.required' => 'Kolom detail image 4 harus di isi.',
             'meta.required' => 'Kolom meta harus di isi.',
             'link.required' => 'Kolom link harus di isi.',
         ];

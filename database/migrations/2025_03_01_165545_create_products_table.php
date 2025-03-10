@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('detail_1');
             $table->string('detail_2');
             $table->string('detail_3');
-            $table->string('detail_4');
+            $table->string('detail_4')->nullable();
             $table->string('meta');
             $table->string('link');
             $table->timestamps();
