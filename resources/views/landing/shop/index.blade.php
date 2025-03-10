@@ -114,7 +114,7 @@
                                         <div class="card-body d-flex justify-content-between align-items-center px-0 pb-0">
                                             <div>
                                                 <h5 class="card-title fw-bolder">{{ $item->judul_product }}</h5>
-                                                <p class="text-muted small mb-2">{{ $item->nama_kategori }}</p>
+                                                <p class="text-muted small mb-2">{{ $kategori->nama_kategori }}</p>
                                             </div>
                                             <span class="badge text-dark px-4 py-3 rounded-pill fw-bolder"
                                                 style="background-color: #F9FAFB">{{ $item->price }}</span>
