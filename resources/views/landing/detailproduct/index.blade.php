@@ -7,7 +7,7 @@
             <!--begin::Row-->
             <div class="row gy-10 mb-md-20">
                 <div class="col-12 col-lg-8">
-                    <div class="row gap-sm-5 gap-md-0 gap-lg-5">
+                    <div class="row gap-sm-5 gap-md-0 gap-3 gap-lg-5">
                         <div class="col-12 col-md-6 col-lg-12 card-product">
                             <!--begin::Image-->
                             <div class="position-relative overflow-hidden text-center bg-transparent"
