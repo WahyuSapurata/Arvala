@@ -24,6 +24,56 @@
     </div>
 @endsection
 @section('content')
+    <style>
+        .drop-zone {
+            border: 2px dashed #007bff;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+        }
+
+        .drop-zone.dragover {
+            background-color: #e9ecef;
+        }
+
+        .drop-zone img {
+            max-width: 100%;
+            height: 100%;
+            display: none;
+            border-radius: 10px;
+        }
+
+        .drop-zone input[type="file"] {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .remove-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: red;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            display: none;
+        }
+    </style>
     <div class="post d-flex flex-column-fluid" id="kt_post">
         <!--begin::Container-->
         <div id="kt_content_container" class="container">
@@ -71,247 +121,46 @@
                                     <div>
                                         <label for="thumbnail" class="form-label">Thumbnail</label>
                                     </div>
-                                    <!--begin::Image input-->
-                                    <div class="image-input image-input-empty" data-kt-image-input="true"
-                                        style="background-image: url(/public/product-thumbnail/{{ $data->thumbnail }})">
-                                        <!--begin::Image preview wrapper-->
-                                        <div class="image-input-wrapper w-125px h-125px"></div>
-                                        <!--end::Image preview wrapper-->
-
-                                        <!--begin::Edit button-->
-                                        <label
-                                            class="btn btn-icon btn-circle btn-color-muted btn-active-color-primary w-25px h-25px bg-body shadow"
-                                            data-kt-image-input-action="change" data-bs-toggle="tooltip"
-                                            data-bs-dismiss="click" title="Change Thumbnail">
-                                            <i class="bi bi-pencil-fill fs-7"></i>
-
-                                            <!--begin::Inputs-->
-                                            <input type="file" name="thumbnail" accept=".png, .jpg, .jpeg" />
-                                            <input type="hidden" name="avatar_remove" />
-                                            <!--end::Inputs-->
-                                        </label>
-                                        <!--end::Edit button-->
-
-                                        <!--begin::Cancel button-->
-                                        <span
-                                            class="btn btn-icon btn-circle btn-color-muted btn-active-color-primary w-25px h-25px bg-body shadow"
-                                            data-kt-image-input-action="cancel" data-bs-toggle="tooltip"
-                                            data-bs-dismiss="click" title="Cancel Thumbnail">
-                                            <i class="bi bi-x fs-2"></i>
-                                        </span>
-                                        <!--end::Cancel button-->
-
-                                        <!--begin::Remove button-->
-                                        <span
-                                            class="btn btn-icon btn-circle btn-color-muted btn-active-color-primary w-25px h-25px bg-body shadow"
-                                            data-kt-image-input-action="remove" data-bs-toggle="tooltip"
-                                            data-bs-dismiss="click" title="Remove Thumbnail">
-                                            <i class="bi bi-x fs-2"></i>
-                                        </span>
-                                        <!--end::Remove button-->
+                                    <div class="drop-zone" id="dropZoneThumbnail">
+                                        <input type="file" class="file-input" name="thumbnail" accept="image/*">
+                                        <p class="placeholder-text"
+                                            style="display: {{ $data->thumbnail ? 'none' : 'block' }};">
+                                            Drag & Drop an image here or click to select
+                                        </p>
+                                        <img class="preview img-fluid shadow"
+                                            src="{{ asset('public/product-thumbnail/' . $data->thumbnail) }}"
+                                            style="display: {{ $data->thumbnail ? 'block' : 'none' }};">
+                                        <button type="button" class="remove-btn"
+                                            style="display: {{ $data->thumbnail ? 'block' : 'none' }};">&times;</button>
                                     </div>
-                                    <!--end::Image input-->
                                     <div>
                                         <small class="text-danger thumbnail_error"></small>
                                     </div>
                                 </div>
 
-                                <div class="d-flex justify-content-between">
-                                    <div class="mb-10">
-                                        <div>
-                                            <label for="detail_1" class="form-label">Detail Image 1</label>
+                                <div class="row mb-10">
+                                    @for ($i = 1; $i <= 4; $i++)
+                                        <div class="col-md-3">
+                                            <label for="detail_{{ $i }}" class="form-label">Detail Image
+                                                {{ $i }}</label>
+                                            <div class="drop-zone" id="dropZone{{ $i }}">
+                                                <input type="file" name="detail_{{ $i }}" accept="image/*"
+                                                    class="file-input">
+                                                <p class="placeholder-text"
+                                                    style="display: {{ $data->{'detail_' . $i} ? 'none' : 'block' }};">
+                                                    Drag & Drop or Click
+                                                </p>
+                                                <img class="preview img-fluid shadow"
+                                                    src="{{ asset('public/product-detail_' . $i . '/' . $data->{'detail_' . $i}) }}"
+                                                    style="display: {{ $data->{'detail_' . $i} ? 'block' : 'none' }};">
+                                                <button type="button" class="remove-btn"
+                                                    style="display: {{ $data->{'detail_' . $i} ? 'block' : 'none' }};">&times;</button>
+                                            </div>
+                                            <div>
+                                                <small class="text-danger detail_{{ $i }}_error"></small>
+                                            </div>
                                         </div>
-                                        <!--begin::Image input-->
-                                        <div class="image-input image-input-empty" data-kt-image-input="true"
-                                            style="background-image: url(/public/product-detail_1/{{ $data->detail_1 }})">
-                                            <!--begin::Image preview wrapper-->
-                                            <div class="image-input-wrapper w-125px h-125px"></div>
-                                            <!--end::Image preview wrapper-->
-
-                                            <!--begin::Edit button-->
-                                            <label
-                                                class="btn btn-icon btn-circle btn-color-muted btn-active-color-primary w-25px h-25px bg-body shadow"
-                                                data-kt-image-input-action="change" data-bs-toggle="tooltip"
-                                                data-bs-dismiss="click" title="Change Detail Image 1">
-                                                <i class="bi bi-pencil-fill fs-7"></i>
-
-                                                <!--begin::Inputs-->
-                                                <input type="file" name="detail_1" accept=".png, .jpg, .jpeg" />
-                                                <input type="hidden" name="avatar_remove" />
-                                                <!--end::Inputs-->
-                                            </label>
-                                            <!--end::Edit button-->
-
-                                            <!--begin::Cancel button-->
-                                            <span
-                                                class="btn btn-icon btn-circle btn-color-muted btn-active-color-primary w-25px h-25px bg-body shadow"
-                                                data-kt-image-input-action="cancel" data-bs-toggle="tooltip"
-                                                data-bs-dismiss="click" title="Cancel Detail Image 1">
-                                                <i class="bi bi-x fs-2"></i>
-                                            </span>
-                                            <!--end::Cancel button-->
-
-                                            <!--begin::Remove button-->
-                                            <span
-                                                class="btn btn-icon btn-circle btn-color-muted btn-active-color-primary w-25px h-25px bg-body shadow"
-                                                data-kt-image-input-action="remove" data-bs-toggle="tooltip"
-                                                data-bs-dismiss="click" title="Remove Detail Image 1">
-                                                <i class="bi bi-x fs-2"></i>
-                                            </span>
-                                            <!--end::Remove button-->
-                                        </div>
-                                        <!--end::Image input-->
-                                        <div>
-                                            <small class="text-danger detail_1_error"></small>
-                                        </div>
-                                    </div>
-
-                                    <div class="mb-10">
-                                        <div>
-                                            <label for="detail_2" class="form-label">Detail Image 2</label>
-                                        </div>
-                                        <!--begin::Image input-->
-                                        <div class="image-input image-input-empty" data-kt-image-input="true"
-                                            style="background-image: url(/public/product-detail_2/{{ $data->detail_2 }})">
-                                            <!--begin::Image preview wrapper-->
-                                            <div class="image-input-wrapper w-125px h-125px"></div>
-                                            <!--end::Image preview wrapper-->
-
-                                            <!--begin::Edit button-->
-                                            <label
-                                                class="btn btn-icon btn-circle btn-color-muted btn-active-color-primary w-25px h-25px bg-body shadow"
-                                                data-kt-image-input-action="change" data-bs-toggle="tooltip"
-                                                data-bs-dismiss="click" title="Change Detail Image 2">
-                                                <i class="bi bi-pencil-fill fs-7"></i>
-
-                                                <!--begin::Inputs-->
-                                                <input type="file" name="detail_2" accept=".png, .jpg, .jpeg" />
-                                                <input type="hidden" name="avatar_remove" />
-                                                <!--end::Inputs-->
-                                            </label>
-                                            <!--end::Edit button-->
-
-                                            <!--begin::Cancel button-->
-                                            <span
-                                                class="btn btn-icon btn-circle btn-color-muted btn-active-color-primary w-25px h-25px bg-body shadow"
-                                                data-kt-image-input-action="cancel" data-bs-toggle="tooltip"
-                                                data-bs-dismiss="click" title="Cancel Detail Image 2">
-                                                <i class="bi bi-x fs-2"></i>
-                                            </span>
-                                            <!--end::Cancel button-->
-
-                                            <!--begin::Remove button-->
-                                            <span
-                                                class="btn btn-icon btn-circle btn-color-muted btn-active-color-primary w-25px h-25px bg-body shadow"
-                                                data-kt-image-input-action="remove" data-bs-toggle="tooltip"
-                                                data-bs-dismiss="click" title="Remove Detail Image 2">
-                                                <i class="bi bi-x fs-2"></i>
-                                            </span>
-                                            <!--end::Remove button-->
-                                        </div>
-                                        <!--end::Image input-->
-                                        <div>
-                                            <small class="text-danger detail_2_error"></small>
-                                        </div>
-                                    </div>
-
-                                    <div class="mb-10">
-                                        <div>
-                                            <label for="detail_3" class="form-label">Detail Image 3</label>
-                                        </div>
-                                        <!--begin::Image input-->
-                                        <div class="image-input image-input-empty" data-kt-image-input="true"
-                                            style="background-image: url(/public/product-detail_3/{{ $data->detail_3 }})">
-                                            <!--begin::Image preview wrapper-->
-                                            <div class="image-input-wrapper w-125px h-125px"></div>
-                                            <!--end::Image preview wrapper-->
-
-                                            <!--begin::Edit button-->
-                                            <label
-                                                class="btn btn-icon btn-circle btn-color-muted btn-active-color-primary w-25px h-25px bg-body shadow"
-                                                data-kt-image-input-action="change" data-bs-toggle="tooltip"
-                                                data-bs-dismiss="click" title="Change Detail Image 3">
-                                                <i class="bi bi-pencil-fill fs-7"></i>
-
-                                                <!--begin::Inputs-->
-                                                <input type="file" name="detail_3" accept=".png, .jpg, .jpeg" />
-                                                <input type="hidden" name="avatar_remove" />
-                                                <!--end::Inputs-->
-                                            </label>
-                                            <!--end::Edit button-->
-
-                                            <!--begin::Cancel button-->
-                                            <span
-                                                class="btn btn-icon btn-circle btn-color-muted btn-active-color-primary w-25px h-25px bg-body shadow"
-                                                data-kt-image-input-action="cancel" data-bs-toggle="tooltip"
-                                                data-bs-dismiss="click" title="Cancel Detail Image 3">
-                                                <i class="bi bi-x fs-2"></i>
-                                            </span>
-                                            <!--end::Cancel button-->
-
-                                            <!--begin::Remove button-->
-                                            <span
-                                                class="btn btn-icon btn-circle btn-color-muted btn-active-color-primary w-25px h-25px bg-body shadow"
-                                                data-kt-image-input-action="remove" data-bs-toggle="tooltip"
-                                                data-bs-dismiss="click" title="Remove Detail Image 3">
-                                                <i class="bi bi-x fs-2"></i>
-                                            </span>
-                                            <!--end::Remove button-->
-                                        </div>
-                                        <!--end::Image input-->
-                                        <div>
-                                            <small class="text-danger detail_3_error"></small>
-                                        </div>
-                                    </div>
-
-                                    <div class="mb-10">
-                                        <div>
-                                            <label for="detail_4" class="form-label">Detail Image 4</label>
-                                        </div>
-                                        <!--begin::Image input-->
-                                        <div class="image-input image-input-empty" data-kt-image-input="true"
-                                            style="background-image: url(/public/product-detail_4/{{ $data->detail_4 }})">
-                                            <!--begin::Image preview wrapper-->
-                                            <div class="image-input-wrapper w-125px h-125px"></div>
-                                            <!--end::Image preview wrapper-->
-
-                                            <!--begin::Edit button-->
-                                            <label
-                                                class="btn btn-icon btn-circle btn-color-muted btn-active-color-primary w-25px h-25px bg-body shadow"
-                                                data-kt-image-input-action="change" data-bs-toggle="tooltip"
-                                                data-bs-dismiss="click" title="Change Detail Image 4">
-                                                <i class="bi bi-pencil-fill fs-7"></i>
-
-                                                <!--begin::Inputs-->
-                                                <input type="file" name="detail_4" accept=".png, .jpg, .jpeg" />
-                                                <input type="hidden" name="avatar_remove" />
-                                                <!--end::Inputs-->
-                                            </label>
-                                            <!--end::Edit button-->
-
-                                            <!--begin::Cancel button-->
-                                            <span
-                                                class="btn btn-icon btn-circle btn-color-muted btn-active-color-primary w-25px h-25px bg-body shadow"
-                                                data-kt-image-input-action="cancel" data-bs-toggle="tooltip"
-                                                data-bs-dismiss="click" title="Cancel Detail Image 4">
-                                                <i class="bi bi-x fs-2"></i>
-                                            </span>
-                                            <!--end::Cancel button-->
-
-                                            <!--begin::Remove button-->
-                                            <span
-                                                class="btn btn-icon btn-circle btn-color-muted btn-active-color-primary w-25px h-25px bg-body shadow"
-                                                data-kt-image-input-action="remove" data-bs-toggle="tooltip"
-                                                data-bs-dismiss="click" title="Remove Detail Image 4">
-                                                <i class="bi bi-x fs-2"></i>
-                                            </span>
-                                            <!--end::Remove button-->
-                                        </div>
-                                        <!--end::Image input-->
-                                        <div>
-                                            <small class="text-danger detail_4_error"></small>
-                                        </div>
-                                    </div>
+                                    @endfor
                                 </div>
 
                                 <div class="mb-10">
@@ -440,6 +289,71 @@
 
         $(function() {
             push_select_kategori();
+        });
+    </script>
+
+    <script>
+        $(document).ready(function() {
+            $('.drop-zone').each(function() {
+                let dropZone = $(this);
+                let fileInput = dropZone.find('.file-input');
+                let preview = dropZone.find('.preview');
+                let placeholderText = dropZone.find('.placeholder-text');
+                let removeBtn = dropZone.find('.remove-btn');
+
+                dropZone.on('dragover', function(event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    $(this).addClass('dragover');
+                });
+
+                dropZone.on('dragleave', function(event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    $(this).removeClass('dragover');
+                });
+
+                dropZone.on('drop', function(event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    $(this).removeClass('dragover');
+                    let files = event.originalEvent.dataTransfer.files;
+                    fileInput[0].files = files;
+                    handleFiles(files);
+                });
+
+                fileInput.on('change', function(event) {
+                    handleFiles(event.target.files);
+                });
+
+                removeBtn.on('click', function() {
+                    fileInput.val('');
+                    preview.hide().attr('src', '');
+                    placeholderText.show();
+                    removeBtn.hide();
+                });
+
+                function handleFiles(files) {
+                    if (files.length > 0) {
+                        let file = files[0];
+                        if (file.type.startsWith('image/')) {
+                            if (file.size > 2 * 1024 * 1024) {
+                                alert('File terlalu besar! Maksimal 2MB.');
+                                return;
+                            }
+                            let reader = new FileReader();
+                            reader.onload = function(event) {
+                                preview.attr('src', event.target.result).show();
+                                placeholderText.hide();
+                                removeBtn.show();
+                            };
+                            reader.readAsDataURL(file);
+                        } else {
+                            alert('Harap unggah file gambar yang valid.');
+                        }
+                    }
+                }
+            });
         });
     </script>
 @endsection
