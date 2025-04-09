@@ -392,10 +392,9 @@ th[rowspan] {
 
 .btn-view-custom i {
     margin-left: 10px;
-    background: white;
     color: black;
     border-radius: 50%;
-    padding: 10px;
+    /* padding: 10px; */
     transition: all 0.3s ease-in-out;
 }
 
@@ -407,6 +406,7 @@ th[rowspan] {
 
 .btn-view-custom:hover i {
     transform: translateX(5px);
+    color: white;
 }
 
 .custom-card {

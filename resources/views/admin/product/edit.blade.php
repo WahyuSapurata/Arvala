@@ -73,6 +73,17 @@
             cursor: pointer;
             display: none;
         }
+
+        .dropzone .dz-preview .dz-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            /* atau 'cover' kalau mau isi penuh */
+        }
+
+        .dz-progress {
+            display: none !important;
+        }
     </style>
     <div class="post d-flex flex-column-fluid" id="kt_post">
         <!--begin::Container-->
@@ -138,29 +149,19 @@
                                     </div>
                                 </div>
 
-                                <div class="row mb-10">
-                                    @for ($i = 1; $i <= 4; $i++)
-                                        <div class="col-md-3">
-                                            <label for="detail_{{ $i }}" class="form-label">Detail Image
-                                                {{ $i }}</label>
-                                            <div class="drop-zone" id="dropZone{{ $i }}">
-                                                <input type="file" name="detail_{{ $i }}" accept="image/*"
-                                                    class="file-input">
-                                                <p class="placeholder-text"
-                                                    style="display: {{ $data->{'detail_' . $i} ? 'none' : 'block' }};">
-                                                    Drag & Drop or Click
-                                                </p>
-                                                <img class="preview img-fluid shadow"
-                                                    src="{{ asset('public/product-detail_' . $i . '/' . $data->{'detail_' . $i}) }}"
-                                                    style="display: {{ $data->{'detail_' . $i} ? 'block' : 'none' }};">
-                                                <button type="button" class="remove-btn"
-                                                    style="display: {{ $data->{'detail_' . $i} ? 'block' : 'none' }};">&times;</button>
-                                            </div>
-                                            <div>
-                                                <small class="text-danger detail_{{ $i }}_error"></small>
+                                <div class="fv-row mb-10">
+                                    <label class="form-label">Image Product</label>
+                                    <div class="dropzone" id="kt_dropzonejs_edit_product">
+                                        <div class="dz-message needsclick">
+                                            <i class="bi bi-file-earmark-arrow-up text-primary fs-3x"></i>
+                                            <div class="ms-4">
+                                                <h3 class="fs-5 fw-bold text-gray-900 mb-1">Drop files here or click to
+                                                    upload</h3>
+                                                <span class="fs-7 fw-semibold text-gray-400">Upload up to 10 files</span>
                                             </div>
                                         </div>
-                                    @endfor
+                                    </div>
+                                    <small class="text-danger image_product_error"></small>
                                 </div>
 
                                 <div class="mb-10">
@@ -212,8 +213,89 @@
             window.history.back();
         })
 
+        Dropzone.autoDiscover = false;
+
+        const existingImages = @json(json_decode($data->image_product ?? '[]'));
+        const storagePath = "{{ asset('public/product-detail') }}";
+        const deletedImages = [];
+
+        const myDropzone = new Dropzone("#kt_dropzonejs_edit_product", {
+            url: "#", // dummy
+            autoProcessQueue: false,
+            uploadMultiple: true,
+            parallelUploads: 10,
+            maxFiles: 10,
+            paramName: "image_product[]",
+            addRemoveLinks: true,
+            init: function() {
+                let dz = this;
+
+                // Preload existing images
+                existingImages.forEach(function(filename) {
+                    const mockFile = {
+                        name: filename,
+                        size: 123456,
+                        accepted: true,
+                        status: Dropzone.ADDED,
+                        type: 'image/jpeg'
+                    };
+
+                    dz.emit("addedfile", mockFile);
+                    dz.emit("thumbnail", mockFile, `${storagePath}/${filename}`);
+                    dz.emit("complete", mockFile);
+
+                    // Tambah hidden input agar terkirim
+                    const hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.name = 'existing_image_product[]';
+                    hiddenInput.value = filename;
+                    mockFile.previewElement.appendChild(hiddenInput);
+                    mockFile._isExisting = true;
+
+                    $(mockFile.previewElement).find('.dz-remove').on('click', function() {
+                        deletedImages.push(filename); // Tandai untuk dihapus
+                        dz.removeFile(mockFile);
+                    });
+                });
+
+                dz.on("addedfile", function(file) {
+                    file.previewElement.classList.add('dz-success', 'dz-complete');
+                });
+
+                dz.on("removedfile", function(file) {
+                    // Untuk file baru, tidak perlu aksi tambahan (tidak dikirim)
+                    if (!file._isExisting) {
+                        return;
+                    }
+
+                    // Jika input hidden ada, hapus
+                    const hidden = file.previewElement.querySelector(
+                        'input[name="existing_image_product[]"]');
+                    if (hidden) {
+                        hidden.remove();
+                    }
+                });
+            }
+        });
+
+        // Submit form
         $(document).on('submit', ".form-data", function(e) {
             e.preventDefault();
+
+            const form = $(".form-data")[0];
+            const formData = new FormData(form);
+
+            // Tambah file baru dari Dropzone
+            myDropzone.files.forEach(file => {
+                if (!file._isExisting) {
+                    formData.append("image_product[]", file);
+                }
+            });
+
+            // Kirim data gambar yang dihapus
+            deletedImages.forEach(filename => {
+                formData.append("deleted_images[]", filename);
+            });
 
             $.ajaxSetup({
                 headers: {
@@ -224,38 +306,25 @@
             $.ajax({
                 type: 'POST',
                 url: '/admin/update-product/' + lastPart,
-                data: new FormData($(".form-data")[0]),
+                data: formData,
                 contentType: false,
                 processData: false,
                 success: function(response) {
                     $(".text-danger").html("");
-                    if (response.success == true) {
-                        swal
-                            .fire({
-                                text: `Product berhasil di Edit`,
-                                icon: "success",
-                                showConfirmButton: false,
-                                timer: 1500,
-                            })
-                            .then(function() {
-                                window.location.href = '/admin/product';
-                            });
-                    } else {
-                        $("form")[0].reset();
-                        $("#from_select").val(null).trigger("change");
-                        // $(".form-select").val(null).trigger("change");
+                    if (response.success) {
                         swal.fire({
-                            title: response.message,
-                            text: response.data,
-                            icon: "warning",
+                            text: `Product berhasil di Edit`,
+                            icon: "success",
                             showConfirmButton: false,
                             timer: 1500,
+                        }).then(function() {
+                            window.location.href = '/admin/product';
                         });
                     }
                 },
                 error: function(xhr) {
                     $(".text-danger").html("");
-                    $.each(xhr.responseJSON["errors"], function(key, value) {
+                    $.each(xhr.responseJSON.errors, function(key, value) {
                         $(`.${key}_error`).html(value);
                     });
                 },

@@ -8,42 +8,23 @@
             <div class="row gy-10 mb-md-20">
                 <div class="col-12 col-lg-8">
                     <div class="row gap-sm-5 gap-md-0 gap-3 gap-lg-5">
-                        <div class="col-12 col-md-6 col-lg-12 card-product">
-                            <!--begin::Image-->
-                            <div class="position-relative overflow-hidden text-center bg-transparent"
-                                style="border-radius: 32px">
-                                <img src="{{ asset('public/product-detail_1/' . $data->detail_1) }}" loading="lazy"
-                                    class="w-100" alt="">
-                            </div>
-                            <!--end::Image-->
-                        </div>
-                        <div class="col-12 col-md-6 col-lg-12 card-product">
-                            <!--begin::Image-->
-                            <div class="position-relative overflow-hidden text-center bg-transparent"
-                                style="border-radius: 32px">
-                                <img src="{{ asset('public/product-detail_2/' . $data->detail_2) }}" loading="lazy"
-                                    class="w-100" alt="">
-                            </div>
-                            <!--end::Image-->
-                        </div>
-                        <div class="col-12 col-md-6 col-lg-12 card-product">
-                            <!--begin::Image-->
-                            <div class="position-relative overflow-hidden text-center bg-transparent"
-                                style="border-radius: 32px">
-                                <img src="{{ asset('public/product-detail_3/' . $data->detail_3) }}" loading="lazy"
-                                    class="w-100" alt="">
-                            </div>
-                            <!--end::Image-->
-                        </div>
-                        <div class="col-12 col-md-6 col-lg-12 card-product">
-                            <!--begin::Image-->
-                            <div class="position-relative overflow-hidden text-center bg-transparent"
-                                style="border-radius: 32px">
-                                <img src="{{ asset('public/product-detail_4/' . $data->detail_4) }}" loading="lazy"
-                                    class="w-100" alt="">
-                            </div>
-                            <!--end::Image-->
-                        </div>
+                        @php
+                            $imageProducts = json_decode($data->image_product, true);
+                        @endphp
+
+                        @if ($imageProducts && is_array($imageProducts))
+                            @foreach ($imageProducts as $image)
+                                <div class="col-12 col-md-6 col-lg-12 card-product">
+                                    <!--begin::Image-->
+                                    <div class="position-relative overflow-hidden text-center bg-transparent"
+                                        style="border-radius: 32px">
+                                        <img src="{{ asset('public/product-detail/' . $image) }}" loading="lazy"
+                                            class="w-100" alt="">
+                                    </div>
+                                    <!--end::Image-->
+                                </div>
+                            @endforeach
+                        @endif
                     </div>
                 </div>
                 <div class="col-12 col-lg-4 position-sticky h-100" style="top: 80px;">

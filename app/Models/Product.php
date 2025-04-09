@@ -20,10 +20,7 @@ class Product extends Model
         'thumbnail',
         'price',
         'deskripsi',
-        'detail_1',
-        'detail_2',
-        'detail_3',
-        'detail_4',
+        'image_product',
         'meta',
         'link',
     ];

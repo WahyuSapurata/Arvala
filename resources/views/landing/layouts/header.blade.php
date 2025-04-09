@@ -87,10 +87,11 @@
                         <!--begin::Menu item-->
                         <div class="menu-item d-flex d-md-none d-lg-none">
                             <!--begin::Menu link-->
-                            <a href="{{ route('shop') }}" class="btn-shop-custom btn btn-primary rounded-pill"
-                                style="font-size: 16px; font-weight: 500;">
-                                Shop <i class="bi bi-bag ms-2 p-2 bg-white text-dark rounded-circle"
-                                    style="font-size: 16px; margin-right: -10px"></i>
+                            <a href="{{ route('shop') }}"
+                                class="btn-shop-custom btn btn-primary fw-normal rounded-pill d-flex align-items-center"
+                                style="font-size: 16px;">
+                                Shop
+                                <i class="bi bi-bag ms-2" style="font-size: 16px; margin-right: -5px"></i>
                             </a>
                             <!--end::Menu link-->
                         </div>
@@ -103,11 +104,10 @@
             <!--begin::Toolbar-->
             <div class="d-none d-md-flex justify-content-end align-items-center">
                 <a href="{{ route('shop') }}"
-                    class="btn-shop-custom btn btn-primary fw-bolder rounded-pill d-flex align-items-center"
-                    style="font-size: 16px; font-weight: 500;">
+                    class="btn-shop-custom btn btn-primary fw-normal rounded-pill d-flex align-items-center"
+                    style="font-size: 16px;">
                     Shop
-                    <i class="bi bi-bag ms-2 p-2 bg-white text-dark rounded-circle"
-                        style="font-size: 16px; margin-right: -10px"></i>
+                    <i class="bi bi-bag ms-2" style="font-size: 16px; margin-right: -5px"></i>
                 </a>
             </div>
 

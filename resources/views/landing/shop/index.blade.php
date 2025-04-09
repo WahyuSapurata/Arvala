@@ -2,20 +2,24 @@
 @section('bg-hero')
     <div class="container">
         <div class="py-10 d-grid text-center gap-1 gap-md-5" style="justify-items: center;">
-            <h5 class="text-dark m-0 p-4 py-2 rounded-pill fw-bolder border border-dark" id="how-it-works"
+            <h5 data-aos="fade-down" data-aos-delay="200" data-aos-duration="1000"
+                class="text-dark m-0 p-4 py-2 rounded-pill fw-bolder border border-dark" id="how-it-works"
                 data-kt-scroll-offset="{default: 100, lg: 150}" style="max-width: max-content">
                 Mockup Shop</h5>
-            <h1 class="fw-bolder fs-4x fs-lg-5x" style="color: #313131">Masterpiece Mockups
+            <h1 data-aos="fade-down" data-aos-delay="400" data-aos-duration="1000" class="fw-bolder fs-4x fs-lg-5x"
+                style="color: #313131">Masterpiece Mockups
                 <br> For Your
                 <span style="color: #8057FC; font-family: Mr Dafoe, sans-serif; font-weight: 400">
                     <span id="kt_landing_hero_text">Ideas</span>
                 </span>
             </h1>
-            <h3 class="fw-normal my-md-5" style="color: #535353">
+            <h3 data-aos="fade-down" data-aos-delay="600" data-aos-duration="1000" class="fw-normal my-md-5"
+                style="color: #535353">
                 Explore a curated collection of premium <br> mockups designed to bring your ideas to life.
             </h3>
             <!--end::Input group=-->
-            <div class="fv-row mb-8 w-250px w-lg-350px mt-4">
+            <div class="fv-row mb-8 w-250px w-lg-350px mt-4" data-aos="fade-up" data-aos-delay="300"
+                data-aos-duration="1000">
                 <!--begin::Wrapper-->
                 <div class="mb-1">
                     <!--begin::Input wrapper-->
@@ -159,7 +163,8 @@
                                 @if (is_array($element))
                                     @foreach ($element as $page => $url)
                                         @if ($page == $product->currentPage())
-                                            <li class="page-item active"><span class="page-link">{{ $page }}</span>
+                                            <li class="page-item active"><span
+                                                    class="page-link">{{ $page }}</span>
                                             </li>
                                         @else
                                             <li class="page-item"><a class="page-link"

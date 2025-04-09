@@ -57,6 +57,11 @@
             opacity: 0;
             cursor: pointer;
         }
+
+        /* Sembunyikan progress bar Dropzone */
+        .dz-progress {
+            display: none !important;
+        }
     </style>
     <div class="post d-flex flex-column-fluid" id="kt_post">
         <!--begin::Container-->
@@ -115,49 +120,17 @@
                                     </div>
                                 </div>
 
-                                <div class="row mb-10">
-                                    <div class="col-md-3">
-                                        <label for="detail_1" class="form-label">Detail Image 1</label>
-                                        <div class="drop-zone" id="dropZone1">
-                                            <input type="file" name="detail_1" accept="image/*" class="file-input">
-                                            <p class="placeholder-text">Drag & Drop or Click</p>
-                                            <img class="preview img-fluid shadow">
-                                        </div>
-                                        <div>
-                                            <small class="text-danger detail_1_error"></small>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label for="detail_2" class="form-label">Detail Image 2</label>
-                                        <div class="drop-zone" id="dropZone2">
-                                            <input type="file" name="detail_2" accept="image/*" class="file-input">
-                                            <p class="placeholder-text">Drag & Drop or Click</p>
-                                            <img class="preview img-fluid shadow">
-                                        </div>
-                                        <div>
-                                            <small class="text-danger detail_2_error"></small>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label for="detail_3" class="form-label">Detail Image 3</label>
-                                        <div class="drop-zone" id="dropZone3">
-                                            <input type="file" name="detail_3" accept="image/*" class="file-input">
-                                            <p class="placeholder-text">Drag & Drop or Click</p>
-                                            <img class="preview img-fluid shadow">
-                                        </div>
-                                        <div>
-                                            <small class="text-danger detail_3_error"></small>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label for="detail_4" class="form-label">Detail Image 4</label>
-                                        <div class="drop-zone" id="dropZone4">
-                                            <input type="file" name="detail_4" accept="image/*" class="file-input">
-                                            <p class="placeholder-text">Drag & Drop or Click</p>
-                                            <img class="preview img-fluid shadow">
-                                        </div>
-                                        <div>
-                                            <small class="text-danger detail_4_error"></small>
+                                <!-- Dropzone container -->
+                                <div class="fv-row mb-10">
+                                    <label class="form-label">Image Product</label>
+                                    <div class="dropzone" id="dropzone-image-product">
+                                        <div class="dz-message needsclick">
+                                            <i class="bi bi-file-earmark-arrow-up text-primary fs-3x"></i>
+                                            <div class="ms-4">
+                                                <h3 class="fs-5 fw-bold text-gray-900 mb-1">Drop files here or click to
+                                                    upload.</h3>
+                                                <span class="fs-7 fw-semibold text-gray-400">Upload up to 10 files</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -224,8 +197,30 @@
             window.history.back();
         })
 
+        Dropzone.autoDiscover = false;
+
+        const dropzone = new Dropzone("#dropzone-image-product", {
+            url: "#", // dummy karena kita submit pakai AJAX manual
+            autoProcessQueue: false,
+            uploadMultiple: true,
+            parallelUploads: 10,
+            maxFiles: 10,
+            maxFilesize: 10,
+            addRemoveLinks: true,
+            paramName: "image_product[]",
+            acceptedFiles: "image/*"
+        });
+
         $(document).on('submit', ".form-data", function(e) {
             e.preventDefault();
+
+            let form = $(this)[0];
+            let formData = new FormData(form);
+
+            // Append file dari Dropzone ke FormData
+            dropzone.getAcceptedFiles().forEach((file, i) => {
+                formData.append("image_product[]", file);
+            });
 
             $.ajaxSetup({
                 headers: {
@@ -236,7 +231,7 @@
             $.ajax({
                 type: 'POST',
                 url: '/admin/store-product',
-                data: new FormData($(".form-data")[0]),
+                data: formData,
                 contentType: false,
                 processData: false,
                 success: function(response) {
@@ -254,8 +249,8 @@
                             });
                     } else {
                         $("form")[0].reset();
+                        dropzone.removeAllFiles();
                         $("#from_select").val(null).trigger("change");
-                        // $(".form-select").val(null).trigger("change");
                         swal.fire({
                             title: response.message,
                             text: response.data,
@@ -279,7 +274,6 @@
                 url: "{{ route('admin.kategori-get') }}",
                 method: "GET",
                 success: function(res) {
-                    console.log(res);
 
                     $('#from_select_kategori').html("");
                     let html = "<option selected disabled>Pilih jenis inputan</option>";

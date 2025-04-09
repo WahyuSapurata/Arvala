@@ -39,38 +39,23 @@ class ProductController extends BaseController
     public function store(StoreProductRequest $storeProductRequest)
     {
         $newThumbnail = '';
-        $newDetail1 = '';
-        $newDetail2 = '';
-        $newDetail3 = '';
-        $newDetail4 = '';
+        $imageDetails = [];
+
+        // Simpan thumbnail
         if ($storeProductRequest->file('thumbnail')) {
             $extension = $storeProductRequest->file('thumbnail')->extension();
-            $newThumbnail = 'thumbnail' . '-' . now()->timestamp . '.' . $extension;
+            $newThumbnail = 'thumbnail-' . now()->timestamp . '.' . $extension;
             $storeProductRequest->file('thumbnail')->storeAs('public/product-thumbnail', $newThumbnail);
         }
 
-        if ($storeProductRequest->file('detail_1')) {
-            $extension = $storeProductRequest->file('detail_1')->extension();
-            $newDetail1 = 'detail_1' . '-' . now()->timestamp . '.' . $extension;
-            $storeProductRequest->file('detail_1')->storeAs('public/product-detail_1', $newDetail1);
-        }
-
-        if ($storeProductRequest->file('detail_2')) {
-            $extension = $storeProductRequest->file('detail_2')->extension();
-            $newDetail2 = 'detail_2' . '-' . now()->timestamp . '.' . $extension;
-            $storeProductRequest->file('detail_2')->storeAs('public/product-detail_2', $newDetail2);
-        }
-
-        if ($storeProductRequest->file('detail_3')) {
-            $extension = $storeProductRequest->file('detail_3')->extension();
-            $newDetail3 = 'detail_3' . '-' . now()->timestamp . '.' . $extension;
-            $storeProductRequest->file('detail_3')->storeAs('public/product-detail_3', $newDetail3);
-        }
-
-        if ($storeProductRequest->file('detail_4')) {
-            $extension = $storeProductRequest->file('detail_4')->extension();
-            $newDetail4 = 'detail_4' . '-' . now()->timestamp . '.' . $extension;
-            $storeProductRequest->file('detail_4')->storeAs('public/product-detail_4', $newDetail4);
+        // Simpan detail gambar (multiple file)
+        if ($storeProductRequest->hasFile('image_product')) {
+            foreach ($storeProductRequest->file('image_product') as $index => $image) {
+                $extension = $image->extension();
+                $filename = 'detail-' . $index . '-' . now()->timestamp . '.' . $extension;
+                $image->storeAs('public/product-detail', $filename);
+                $imageDetails[] = $filename;
+            }
         }
 
         try {
@@ -81,17 +66,15 @@ class ProductController extends BaseController
             $data->thumbnail = $newThumbnail;
             $data->price = $storeProductRequest->price;
             $data->deskripsi = $storeProductRequest->deskripsi;
-            $data->detail_1 = $newDetail1;
-            $data->detail_2 = $newDetail2;
-            $data->detail_3 = $newDetail3;
-            $data->detail_4 = $newDetail4;
+            $data->image_product = json_encode($imageDetails); // simpan array ke kolom JSON
             $data->meta = $storeProductRequest->meta;
             $data->link = $storeProductRequest->link;
             $data->save();
         } catch (\Exception $e) {
             return $this->sendError($e->getMessage(), $e->getMessage(), 400);
         }
-        return $this->sendResponse($data, 'Add event success');
+
+        return $this->sendResponse($data, 'Add product success');
     }
 
     public function edit($params)
@@ -103,121 +86,94 @@ class ProductController extends BaseController
 
     public function update(UpdateProductRequest $updateProductRequest, $params)
     {
-        $data = Product::where('uuid', $params)->first();
+        $product = Product::where('uuid', $params)->first();
 
-        $oldThumbnail = public_path('/public/product-thumbnail/' . $data->thumbnail);
-        $oldDetail1 = public_path('/public/product-detail_1/' . $data->detail_1);
-        $oldDetail2 = public_path('/public/product-detail_2/' . $data->detail_2);
-        $oldDetail3 = public_path('/public/product-detail_3/' . $data->detail_3);
-        $oldDetail4 = public_path('/public/product-detail_4/' . $data->detail_4);
+        // === HANDLE THUMBNAIL ===
+        if ($updateProductRequest->hasFile('thumbnail')) {
+            $oldThumbnailPath = public_path('public/product-thumbnail/' . $product->thumbnail);
+            if (File::exists($oldThumbnailPath)) {
+                File::delete($oldThumbnailPath);
+            }
 
-        $newThumbnail = '';
-        $newDetail1 = '';
-        $newDetail2 = '';
-        $newDetail3 = '';
-        $newDetail4 = '';
-        if ($updateProductRequest->file('thumbnail')) {
-            $extension = $updateProductRequest->file('thumbnail')->extension();
-            $newThumbnail = 'thumbnail' . '-' . now()->timestamp . '.' . $extension;
-            $updateProductRequest->file('thumbnail')->storeAs('public/product-thumbnail', $newThumbnail);
+            $thumbnailFile = $updateProductRequest->file('thumbnail');
+            $thumbnail = 'thumbnail-' . now()->timestamp . '.' . $thumbnailFile->extension();
+            $thumbnailFile->storeAs('public/product-thumbnail', $thumbnail);
+        } else {
+            $thumbnail = $product->thumbnail;
+        }
 
-            if (File::exists($oldThumbnail)) {
-                File::delete($oldThumbnail);
+        $existingImages = json_decode($product->image_product, true) ?? [];
+        $deletedImages = $updateProductRequest->deleted_images ?? [];
+        $newImages = [];
+
+        // Simpan gambar lama yang tidak dihapus
+        foreach ($existingImages as $img) {
+            if (!in_array($img, $deletedImages)) {
+                $newImages[] = $img;
+            } else {
+                $oldPath = public_path('public/product-detail/' . $img);
+                if (File::exists($oldPath)) {
+                    File::delete($oldPath);
+                }
             }
         }
 
-        if ($updateProductRequest->file('detail_1')) {
-            $extension = $updateProductRequest->file('detail_1')->extension();
-            $newDetail1 = 'detail_1' . '-' . now()->timestamp . '.' . $extension;
-            $updateProductRequest->file('detail_1')->storeAs('public/product-detail_1', $newDetail1);
-
-
-            if (File::exists($oldDetail1)) {
-                File::delete($oldDetail1);
+        // Tambah file baru yang diupload
+        if ($updateProductRequest->hasFile('image_product')) {
+            foreach ($updateProductRequest->file('image_product') as $index => $file) {
+                $filename = 'image_' . $index . '-' . now()->timestamp . '.' . $file->extension();
+                $file->storeAs('public/product-detail', $filename);
+                $newImages[] = $filename;
             }
         }
 
-        if ($updateProductRequest->file('detail_2')) {
-            $extension = $updateProductRequest->file('detail_2')->extension();
-            $newDetail2 = 'detail_2' . '-' . now()->timestamp . '.' . $extension;
-            $updateProductRequest->file('detail_2')->storeAs('public/product-detail_2', $newDetail2);
-
-            if (File::exists($oldDetail2)) {
-                File::delete($oldDetail2);
-            }
-        }
-
-        if ($updateProductRequest->file('detail_3')) {
-            $extension = $updateProductRequest->file('detail_3')->extension();
-            $newDetail3 = 'detail_3' . '-' . now()->timestamp . '.' . $extension;
-            $updateProductRequest->file('detail_3')->storeAs('public/product-detail_3', $newDetail3);
-
-            if (File::exists($oldDetail3)) {
-                File::delete($oldDetail3);
-            }
-        }
-
-        if ($updateProductRequest->file('detail_4')) {
-            $extension = $updateProductRequest->file('detail_4')->extension();
-            $newDetail4 = 'detail_4' . '-' . now()->timestamp . '.' . $extension;
-            $updateProductRequest->file('detail_4')->storeAs('public/product-detail_4', $newDetail4);
-
-            if (File::exists($oldDetail4)) {
-                File::delete($oldDetail4);
-            }
-        }
-
+        // === SIMPAN SEMUA DATA ===
         try {
-            $data->uuid_kategori = $updateProductRequest->uuid_kategori;
-            $data->judul_product = $updateProductRequest->judul_product;
-            $data->slug = Str::slug($updateProductRequest->judul_product);
-            $data->thumbnail = $updateProductRequest->file('thumbnail') ? $newThumbnail : $data->thumbnail;
-            $data->price = $updateProductRequest->price;
-            $data->deskripsi = $updateProductRequest->deskripsi;
-            $data->detail_1 = $updateProductRequest->file('detail_1') ? $newDetail1 : $data->detail_1;
-            $data->detail_2 = $updateProductRequest->file('detail_2') ? $newDetail2 : $data->detail_2;
-            $data->detail_3 = $updateProductRequest->file('detail_3') ? $newDetail3 : $data->detail_3;
-            $data->detail_4 = $updateProductRequest->file('detail_4') ? $newDetail4 : $data->detail_4;
-            $data->meta = $updateProductRequest->meta;
-            $data->link = $updateProductRequest->link;
-            $data->save();
+            $product->uuid_kategori = $updateProductRequest->uuid_kategori;
+            $product->judul_product = $updateProductRequest->judul_product;
+            $product->slug = Str::slug($updateProductRequest->judul_product);
+            $product->thumbnail = $thumbnail;
+            $product->price = $updateProductRequest->price;
+            $product->deskripsi = $updateProductRequest->deskripsi;
+            $product->image_product = json_encode($newImages);
+            $product->meta = $updateProductRequest->meta;
+            $product->link = $updateProductRequest->link;
+            $product->save();
         } catch (\Exception $e) {
             return $this->sendError($e->getMessage(), $e->getMessage(), 400);
         }
-        return $this->sendResponse($data, 'Update event success');
+
+        return $this->sendResponse($product, 'Update product success');
     }
 
     public function delete($params)
     {
-        $data = array();
         try {
-            $data = Product::where('uuid', $params)->first();
-            // Simpan nama foto lama untuk dihapus
-            $oldThumbnail = public_path('/public/product-thumbnail/' . $data->thumbnail);
-            $oldDetail1 = public_path('/public/product-detail_1/' . $data->detail_1);
-            $oldDetail2 = public_path('/public/product-detail_2/' . $data->detail_2);
-            $oldDetail3 = public_path('/public/product-detail_3/' . $data->detail_3);
-            $oldDetail4 = public_path('/public/product-detail_4/' . $data->detail_4);
-            // Hapus foto lama jika ada
-            if (File::exists($oldThumbnail)) {
-                File::delete($oldThumbnail);
+            $product = Product::where('uuid', $params)->firstOrFail();
+
+            // Hapus thumbnail
+            $thumbnailPath = public_path('public/product-thumbnail/' . $product->thumbnail);
+            if (File::exists($thumbnailPath)) {
+                File::delete($thumbnailPath);
             }
-            if (File::exists($oldDetail1)) {
-                File::delete($oldDetail1);
+
+            // Hapus semua gambar dari image_product (jika ada)
+            $imageProductArray = json_decode($product->image_product, true);
+            if (is_array($imageProductArray)) {
+                foreach ($imageProductArray as $imageFilename) {
+                    $imagePath = public_path('public/product-detail/' . $imageFilename);
+                    if (File::exists($imagePath)) {
+                        File::delete($imagePath);
+                    }
+                }
             }
-            if (File::exists($oldDetail2)) {
-                File::delete($oldDetail2);
-            }
-            if (File::exists($oldDetail3)) {
-                File::delete($oldDetail3);
-            }
-            if (File::exists($oldDetail4)) {
-                File::delete($oldDetail4);
-            }
-            $data->delete();
+
+            // Hapus data produk
+            $product->delete();
+
+            return $this->sendResponse($product, 'Delete product success');
         } catch (\Exception $e) {
             return $this->sendError($e->getMessage(), $e->getMessage(), 400);
         }
-        return $this->sendResponse($data, 'Delete Event success');
     }
 }

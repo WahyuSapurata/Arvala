@@ -19,6 +19,17 @@ class Landing extends BaseController
                 $latest->kategori = $data->nama_kategori;
                 return $latest;
             });
+        $bundle_product = Product::latest()
+            ->take(6)
+            ->get()
+            ->map(function ($latest) {
+                $data = Kategori::where('uuid', $latest->uuid_kategori)->first();
+                $latest->kategori = $data->nama_kategori;
+                return $latest;
+            });
+        $bundle_product = $bundle_product->filter(function ($item) {
+            return $item->kategori == 'Bundle';
+        });
         $more_product = Product::take(6)
             ->get()
             ->map(function ($more) {
@@ -26,7 +37,7 @@ class Landing extends BaseController
                 $more->kategori = $data->nama_kategori;
                 return $more;
             });
-        return view('landing.home.index', compact('module', 'latest_product', 'more_product'));
+        return view('landing.home.index', compact('module', 'latest_product', 'bundle_product', 'more_product'));
     }
 
     public function detail_product($params)

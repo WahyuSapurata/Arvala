@@ -33,6 +33,7 @@
     <link href="{{ asset('assets/plugins/custom/jquery-ui/jquery-ui.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('assets/css/style.bundle.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('assets/css/style.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/aos/dist/aos.css') }}" rel="stylesheet" type="text/css" />
     <!--end::Global Stylesheets Bundle-->
 </head>
 <!--end::Head-->
@@ -1072,6 +1073,7 @@
     <script src="{{ asset('assets/plugins/global/plugins.bundle.js') }}"></script>
     <script src="{{ asset('assets/plugins/custom/jquery-ui/jquery-ui.js') }}"></script>
     <script src="{{ asset('assets/js/scripts.bundle.js') }}"></script>
+    <script src="{{ asset('assets/aos/dist/aos.js') }}"></script>
     <!--end::Global Javascript Bundle-->
     <!--begin::Vendors Javascript(used by this page)-->
     <script src="{{ asset('assets/plugins/custom/fslightbox/fslightbox.bundle.js') }}"></script>
@@ -1083,6 +1085,10 @@
     <script src="{{ asset('assets/js/custom/modals/upgrade-plan.js') }}"></script>
     <!--end::Custom Javascript-->
     <!--end::Javascript-->
+
+    <script>
+        AOS.init();
+    </script>
 
     @yield('script')
 

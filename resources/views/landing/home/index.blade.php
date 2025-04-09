@@ -2,16 +2,56 @@
 @section('bg-hero')
     <div class="container">
         <div class="w-100 py-10">
-            <img src="{{ asset('bg-default.png') }}" class="w-100 backgriund-landing d-none d-md-block" loading="lazy"
-                style="height: 100%" alt="">
-            <img src="{{ asset('bg-mobile.png') }}" class="w-100 backgriund-landing d-block d-md-none" loading="lazy"
-                style="height: 100%" alt="">
+            {{-- <img src="{{ asset('bg-default.png') }}" class="w-100 backgriund-landing d-none d-md-block" loading="lazy"
+                style="height: 100%" alt=""> --}}
+            <div class="w-100 backgriund-landing d-none d-md-block position-relative py-10" style="height: 100%">
+                <div class="p-15" style="background-color: #F4F4F4; border-radius: 40px">
+                    <div data-aos="fade-up" data-aos-delay="200" data-aos-duration="1000" class="d-grid" style=" gap: 32px;">
+                        <h1 class="fw-bolder fs-4x fs-lg-5hx" style="color: #313131"><span
+                                style="color: #8057FC; font-family: Mr Dafoe, sans-serif; font-weight: 400">
+                                <span id="kt_landing_hero_text">The</span>
+                            </span> Ultimate
+                            <br> <span style="color: #8057FC;">Mockup</span> Library
+                            <br>for <span style="color: #8057FC;">Designers</span>
+                        </h1>
+                        <h2 class="fw-normal fs-1" style="color: #4F4F4F;">Arvala is a high-quality mockup template <br>
+                            library designed with top-tier precision and <br>
+                            modern design standards.</h2>
+                    </div>
+                </div>
+                <img src="{{ asset('Subtract.png') }}" loading="lazy" class="position-absolute top-0 end-0"
+                    data-aos="fade-left" data-aos-delay="400" data-aos-duration="1000" width="740px" alt="">
+            </div>
+            {{-- <img src="{{ asset('bg-mobile.png') }}" class="w-100 backgriund-landing d-block d-md-none" loading="lazy"
+                style="height: 100%" alt=""> --}}
+            <div class="w-100 backgriund-landing d-block d-md-none" style="height: 420px;">
+                <div class="py-12" style="border-radius: 20px; background-color: #7C35EF; height: 100%">
+                    <div class="position-relative">
+                        <div data-aos="fade-up" data-aos-delay="200" data-aos-duration="1000"
+                            class="d-grid px-10 position-relative z-index-2" style=" gap: 16px;">
+                            <h1 class="fw-bolder fs-5hx" style="color: #F8F5FD"><span
+                                    style="color: #DADA73; font-family: Mr Dafoe, sans-serif; font-weight: 400">
+                                    <span id="kt_landing_hero_text">The</span>
+                                </span> Ultimate
+                                <br> <span style="color: #DADA73;">Mockup</span> Library
+                                <br>for <span style="color: #DADA73;">Designers</span>
+                            </h1>
+                            <h2 class="fw-normal fs-1" style="color: #E6DEF4;">Arvala is a high-quality mockup template <br>
+                                library designed with top-tier precision and <br>
+                                modern design standards.</h2>
+                        </div>
+                        <img src="{{ asset('Subtrack_mobile.png') }}" loading="lazy" width="95%"
+                            class="position-absolute top-0 end-0 z-index-1" data-aos="fade-left" data-aos-delay="400"
+                            data-aos-duration="1000" alt="">
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 @endsection
 @section('content')
     <!--begin::How It Works Section-->
-    <div class="mb-n10 mb-lg-n20 z-index-2 mt-5">
+    <div class="mb-n10 mb-lg-n20 z-index-2 mt-20">
         <!--begin::Container-->
         <div class="container">
             <!--begin::Heading-->
@@ -47,7 +87,68 @@
                                     <p class="text-muted small mb-2">{{ $latest->kategori }}</p>
                                 </div>
                                 <span class="badge text-white px-4 py-3 rounded-pill fw-bolder"
-                                    style="background-color: #ADAD47">{{ $latest->price }}</span>
+                                    style="background-color: #323232">{{ $latest->price }}</span>
+                            </div>
+                            <!--end::Card Body-->
+                        </a>
+                        <!--end::Card-->
+                    </div>
+                    <!--end::Col-->
+                @empty
+                    <div class="card text-center shadow-sm">
+                        <div class="card-body">
+                            <i class="bi bi-box-seam display-4 text-muted"></i>
+                            <h5 class="card-title mt-3 text-muted">Tidak ada data</h5>
+                            <p class="text-muted">Silakan tambahkan data terlebih dahulu.</p>
+                        </div>
+                    </div>
+                @endforelse
+
+            </div>
+            <!--end::Row-->
+        </div>
+        <!--end::Container-->
+    </div>
+    <!--end::How It Works Section-->
+
+    <!--begin::How It Works Section-->
+    <div class="mb-n10 mb-lg-n20 z-index-2 mt-20">
+        <!--begin::Container-->
+        <div class="container">
+            <!--begin::Heading-->
+            <div class="d-flex justify-content-between align-items-center mb-17">
+                <!--begin::Title-->
+                <h3 class="text-dark" id="how-it-works" data-kt-scroll-offset="{default: 100, lg: 150}">
+                    Bundle Mockup</h3>
+                <a href="{{ route('shop') }}" class="btn btn-view-custom">View More <i
+                        class="bi bi-arrow-right fs-4 ms-3"></i></a>
+                <!--end::Title-->
+            </div>
+            <!--end::Heading-->
+            <!--begin::Row-->
+            <div class="row gy-10 mb-md-20">
+
+                @forelse ($bundle_product as $bundle)
+                    <!--begin::Col-->
+                    <div class="col-sm-12 col-md-6 col-lg-4">
+                        <!--begin::Card-->
+                        <a href="{{ route('detail-product', ['params' => $bundle->slug]) }}"
+                            class="card card-product border-0">
+                            <!--begin::Image-->
+                            <div class="position-relative overflow-hidden text-center bg-light rounded-3">
+                                <img src="{{ asset('public/product-thumbnail/' . $bundle->thumbnail) }}" loading="lazy"
+                                    class="w-100 rounded-2" alt="{{ $bundle->judul_product }}">
+                            </div>
+                            <!--end::Image-->
+
+                            <!--begin::Card Body-->
+                            <div class="card-body d-flex justify-content-between align-items-center px-0 pb-0">
+                                <div>
+                                    <h5 class="card-title fw-bolder">{{ $bundle->judul_product }}</h5>
+                                    <p class="text-muted small mb-2">{{ $bundle->kategori }}</p>
+                                </div>
+                                <span class="badge text-white px-4 py-3 rounded-pill fw-bolder"
+                                    style="background-color: #323232">{{ $bundle->price }}</span>
                             </div>
                             <!--end::Card Body-->
                         </a>
@@ -108,7 +209,7 @@
                                     <p class="text-muted small mb-2">{{ $more->kategori }}</p>
                                 </div>
                                 <span class="badge text-white px-4 py-3 rounded-pill fw-bolder"
-                                    style="background-color: #F5297A">{{ $more->price }}</span>
+                                    style="background-color: #323232">{{ $more->price }}</span>
                             </div>
                             <!--end::Card Body-->
                         </a>
