@@ -24,25 +24,25 @@
             </div>
             {{-- <img src="{{ asset('bg-mobile.png') }}" class="w-100 backgriund-landing d-block d-md-none" loading="lazy"
                 style="height: 100%" alt=""> --}}
-            <div class="w-100 backgriund-landing d-block d-md-none" style="height: 420px;">
-                <div class="py-12" style="border-radius: 20px; background-color: #7C35EF; height: 100%">
+            <div class="w-100 backgriund-landing d-block d-md-none">
+                <div class="py-12" style="border-radius: 20px; background-color: #F4F4F4; height: 100%">
                     <div class="position-relative">
                         <div data-aos="fade-up" data-aos-delay="200" data-aos-duration="1000"
                             class="d-grid px-10 position-relative z-index-2" style=" gap: 16px;">
-                            <h1 class="fw-bolder fs-5hx" style="color: #F8F5FD"><span
-                                    style="color: #DADA73; font-family: Mr Dafoe, sans-serif; font-weight: 400">
+                            <h1 class="fw-bolder fs-5hx" style="color: #313131"><span
+                                    style="color: #8057FC; font-family: Mr Dafoe, sans-serif; font-weight: 400">
                                     <span id="kt_landing_hero_text">The</span>
                                 </span> Ultimate
-                                <br> <span style="color: #DADA73;">Mockup</span> Library
-                                <br>for <span style="color: #DADA73;">Designers</span>
+                                <br> <span style="color: #8057FC;">Mockup</span> Library
+                                <br>for <span style="color: #8057FC;">Designers</span>
                             </h1>
-                            <h2 class="fw-normal fs-1" style="color: #E6DEF4;">Arvala is a high-quality mockup template <br>
-                                library designed with top-tier precision and <br>
+                            <h2 class="fw-normal fs-1" style="color: #4F4F4F;">Arvala is a high-quality mockup template
+                                library designed with top-tier precision and
                                 modern design standards.</h2>
                         </div>
-                        <img src="{{ asset('Subtrack_mobile.png') }}" loading="lazy" width="95%"
+                        {{-- <img src="{{ asset('Subtrack_mobile.png') }}" loading="lazy" width="95%"
                             class="position-absolute top-0 end-0 z-index-1" data-aos="fade-left" data-aos-delay="400"
-                            data-aos-duration="1000" alt="">
+                            data-aos-duration="1000" alt=""> --}}
                     </div>
                 </div>
             </div>
