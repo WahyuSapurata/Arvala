@@ -478,6 +478,7 @@ th[rowspan] {
 .btn-shop-custom.btn.btn-primary:hover:not(.btn-active) {
     background-color: transparent !important;
     color: #151a30;
+    border: 1px solid #000 !important;
 }
 
 @media (max-width: 768px) {

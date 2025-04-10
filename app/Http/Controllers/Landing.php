@@ -12,12 +12,17 @@ class Landing extends BaseController
     {
         $module = 'Home';
         $latest_product = Product::latest()
-            ->take(6)
+            ->take(10) // ambil lebih banyak dulu agar tidak terlalu cepat habis setelah filter
             ->get()
-            ->map(function ($latest) {
-                $data = Kategori::where('uuid', $latest->uuid_kategori)->first();
-                $latest->kategori = $data->nama_kategori;
-                return $latest;
+            ->filter(function ($product) {
+                $kategori = Kategori::where('uuid', $product->uuid_kategori)->first();
+                return $kategori && strtolower($kategori->nama_kategori) !== 'bundle';
+            })
+            ->take(6) // ambil hanya 6 setelah difilter
+            ->map(function ($product) {
+                $kategori = Kategori::where('uuid', $product->uuid_kategori)->first();
+                $product->kategori = $kategori ? $kategori->nama_kategori : '-';
+                return $product;
             });
         $bundle_product = Product::latest()
             ->take(6)
@@ -28,14 +33,19 @@ class Landing extends BaseController
                 return $latest;
             });
         $bundle_product = $bundle_product->filter(function ($item) {
-            return $item->kategori == 'Bundle';
+            return strtolower($item->kategori) == 'bundle';
         });
-        $more_product = Product::take(6)
+        $more_product = Product::take(10)
             ->get()
-            ->map(function ($more) {
-                $data = Kategori::where('uuid', $more->uuid_kategori)->first();
-                $more->kategori = $data->nama_kategori;
-                return $more;
+            ->filter(function ($product) {
+                $kategori = Kategori::where('uuid', $product->uuid_kategori)->first();
+                return $kategori && strtolower($kategori->nama_kategori) !== 'bundle';
+            })
+            ->take(6)
+            ->map(function ($product) {
+                $kategori = Kategori::where('uuid', $product->uuid_kategori)->first();
+                $product->kategori = $kategori ? $kategori->nama_kategori : '-';
+                return $product;
             });
         return view('landing.home.index', compact('module', 'latest_product', 'bundle_product', 'more_product'));
     }
