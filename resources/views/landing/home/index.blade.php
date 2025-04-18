@@ -193,7 +193,7 @@
                     <!--begin::Col-->
                     <div class="col-sm-12 col-md-6 col-lg-4">
                         <!--begin::Card-->
-                        <a href="{{ route('detail-product', ['params' => $latest->slug]) }}"
+                        <a href="{{ route('detail-product', ['params' => $more->slug]) }}"
                             class="card card-product border-0">
                             <!--begin::Image-->
                             <div class="position-relative overflow-hidden text-center bg-light rounded-3">
