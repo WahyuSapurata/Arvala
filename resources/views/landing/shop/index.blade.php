@@ -104,11 +104,7 @@
                     <div class="tab-pane fade" id="kt_vtab_pane_{{ $kategori->uuid }}" role="tabpanel">
                         <div class="row gy-10">
                             @php
-                                $productsInCategory = $product->where('uuid_kategori', $kategori->uuid);
-                                $productsInCategory->map(function ($item_kategori) use ($kategori) {
-                                    $item_kategori->nama_kategori = $kategori->nama_kategori;
-                                    return $item_kategori;
-                                });
+                                $productsInCategory = $productByCategory[$kategori->uuid] ?? collect([]);
                             @endphp
 
                             @forelse ($productsInCategory as $item)

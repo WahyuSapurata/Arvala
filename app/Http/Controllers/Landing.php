@@ -63,7 +63,7 @@ class Landing extends BaseController
         $module = 'Shop';
         $data_kategori = Kategori::all();
 
-        // Query untuk produk dengan pencarian
+        // Produk untuk tab "All"
         $product = Product::when($request->search, function ($query) use ($request) {
             $query->where('meta', 'like', '%' . $request->search . '%');
         })
@@ -71,7 +71,13 @@ class Landing extends BaseController
             ->select('products.*', 'kategoris.nama_kategori as kategori')
             ->paginate(6);
 
-        return view('landing.shop.index', compact('module', 'data_kategori', 'product'));
+        // Ambil semua produk dan kelompokkan berdasarkan kategori
+        $productByCategory = Product::join('kategoris', 'products.uuid_kategori', '=', 'kategoris.uuid')
+            ->select('products.*', 'kategoris.nama_kategori')
+            ->get()
+            ->groupBy('uuid_kategori');
+
+        return view('landing.shop.index', compact('module', 'data_kategori', 'product', 'productByCategory'));
     }
 
     public function about()
