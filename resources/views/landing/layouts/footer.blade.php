@@ -22,26 +22,7 @@
                 <!--begin::Col-->
                 <div class="col-md-6">
                     <!--begin::Navs-->
-                    <div class="d-grid d-md-flex gap-4 gap-lg-0 justify-content-lg-end">
-                        <!--begin::Links-->
-                        <div class="d-flex fw-semibold flex-column me-20">
-                            <!--begin::Subtitle-->
-                            <h4 class="fw-bolder mb-6" style="color: #2D2D2D">Browse</h4>
-                            <!--end::Subtitle-->
-                            <!--begin::Link-->
-                            <a href="" class="text-hover-primary fs-6 fs-lg-5 mb-6" style="color: #585858">Best
-                                Seller</a>
-                            <!--end::Link-->
-                            <!--begin::Link-->
-                            <a href="" class="text-hover-primary fs-6 fs-lg-5 mb-6"
-                                style="color: #585858">Freebis</a>
-                            <!--end::Link-->
-                            <!--begin::Link-->
-                            <a href="" class="text-hover-primary fs-6 fs-lg-5 mb-6"
-                                style="color: #585858">Bundle</a>
-                            <!--end::Link-->
-                        </div>
-                        <!--end::Links-->
+                    <div class="d-flex gap-4 gap-lg-0 justify-content-lg-between">
                         <!--begin::Links-->
                         <div class="d-flex fw-semibold flex-column me-20">
                             <!--begin::Subtitle-->
@@ -66,10 +47,12 @@
                             <h4 class="fw-bolder mb-6" style="color: #2D2D2D">Follow Us</h4>
                             <!--end::Subtitle-->
                             <!--begin::Link-->
-                            <a href="" class="text-hover-primary fs-5 mb-6" style="color: #585858">Instagram</a>
+                            <a href="https://www.instagram.com/mockup.arvala/" target="_blank"
+                                class="text-hover-primary fs-5 mb-6" style="color: #585858">Instagram</a>
                             <!--end::Link-->
                             <!--begin::Link-->
-                            <a href="" class="text-hover-primary fs-5 mb-6" style="color: #585858">YouTube</a>
+                            <a href="https://www.youtube.com/@arvalamockup" target="_blank"
+                                class="text-hover-primary fs-5 mb-6" style="color: #585858">YouTube</a>
                             <!--end::Link-->
                         </div>
                         <!--end::Links-->
