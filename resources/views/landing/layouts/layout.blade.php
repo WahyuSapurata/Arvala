@@ -45,6 +45,35 @@
     <link href="{{ asset('assets/css/style.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('assets/aos/dist/aos.css') }}" rel="stylesheet" type="text/css" />
     <!--end::Global Stylesheets Bundle-->
+
+    <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "name": "Kilq Mockup",
+          "url": "https://arvalamockup.com/",
+          "description": "Kilq is a professional product mockup template designed for creators and entrepreneurs to present and sell digital goods with high-quality visuals.",
+          "publisher": {
+            "@type": "Organization",
+            "name": "Kilq Mockup",
+            "logo": {
+              "@type": "ImageObject",
+              "url": "https://arvalamockup.com/logo_arvala.png"
+            }
+          },
+          "image": {
+            "@type": "ImageObject",
+            "url": "https://arvalamockup.com/logo_arvala.png",
+            "height": 600,
+            "width": 800
+          },
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://arvalamockup.com/?s={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        }
+        </script>
 </head>
 <!--end::Head-->
 <!--begin::Body-->
