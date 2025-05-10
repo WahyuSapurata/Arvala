@@ -12,8 +12,8 @@
                     <div class="d-grid gap-5">
                         <img src="{{ asset('logo_arvala.png') }}" class="h-20px h-lg-35px" alt="">
                         <div class="flex-equal fs-lg-4" style="color: #585858">
-                            Empowering designers with high-quality, easy-to-edit mockups to showcase creativity with
-                            style and precision.
+                            Official License Agreement and Usage Guidelines
+                            for Arvala Mockup Digital Products
                         </div>
                     </div>
                     <!--end::Block-->
@@ -29,10 +29,8 @@
                             <h4 class="fw-bolder mb-6" style="color: #2D2D2D">Resources</h4>
                             <!--end::Subtitle-->
                             <!--begin::Link-->
-                            <a href="" class="text-hover-primary fs-5 mb-6" style="color: #585858">Contact</a>
-                            <!--end::Link-->
-                            <!--begin::Link-->
-                            <a href="" class="text-hover-primary fs-5 mb-6" style="color: #585858">License
+                            <a href="{{ route('lisensi') }}" class="text-hover-primary fs-5 mb-6"
+                                style="color: #585858">License
                                 Information</a>
                             <!--end::Link-->
                             <!--begin::Link-->

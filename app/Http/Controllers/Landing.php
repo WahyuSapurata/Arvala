@@ -91,4 +91,10 @@ class Landing extends BaseController
         $module = 'FAQs';
         return view('landing.faqs.index', compact('module'));
     }
+
+    public function lisensi()
+    {
+        $module = 'Lisensi';
+        return view('landing.lisensi.index', compact('module'));
+    }
 }

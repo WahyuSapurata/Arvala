@@ -38,7 +38,7 @@
                     data-kt-swapper-parent="{default: '#kt_body', lg: '#kt_header_nav_wrapper'}">
                     <!--begin::Menu-->
                     <div class="menu menu-column flex-nowrap menu-rounded menu-lg-row menu-title-gray-500 menu-state-title-primary nav nav-flush gap-3 fs-5 fw-semibold"
-                        id="kt_landing_menu">
+                        id="kt_landing_menu" data-kt-menu="true">
                         <!--begin::Menu item-->
                         <div class="menu-item d-flex d-lg-none">
                             <!--begin::Menu link-->
@@ -67,22 +67,85 @@
                         </div> --}}
                         <!--end::Menu item-->
                         <!--begin::Menu item-->
-                        <div class="menu-item">
+                        {{-- <div class="menu-item">
                             <!--begin::Menu link-->
                             <a class="menu-link nav-link py-3 px-4 px-xxl-6 {{ Request::is('about') ? 'active' : '' }}"
                                 href="{{ route('about') }}" data-kt-scroll-toggle="true"
                                 data-kt-drawer-dismiss="true">About</a>
                             <!--end::Menu link-->
+                        </div> --}}
+                        <!--end::Menu item-->
+                        <!--begin::Menu item-->
+                        <div class="menu-item" data-kt-menu-trigger="hover" data-kt-menu-placement="bottom-start">
+                            <!--begin::Menu link-->
+                            <a href="#" class="menu-link py-3">
+                                <span class="menu-title">About</span>
+                                <span class="menu-arrow"></span>
+                            </a>
+                            <!--end::Menu link-->
+
+                            <!--begin::Menu sub-->
+                            <div class="menu-sub menu-sub-dropdown p-3 w-200px" id="menu-sub">
+                                <!--begin::Menu item-->
+                                <div class="menu-item">
+                                    <a href="{{ route('about') }}#tutorial" class="menu-link px-3 py-3"
+                                        id="link-tutorial">
+                                        <span class="menu-title">Tutorial</span>
+                                    </a>
+                                </div>
+
+                                <div class="menu-item">
+                                    <a href="{{ route('about') }}#faq" class="menu-link px-3 py-3" id="link-faq">
+                                        <span class="menu-title">FAQ</span>
+                                    </a>
+                                </div>
+                            </div>
+                            <!--end::Menu sub-->
+
+                            <script>
+                                document.addEventListener("DOMContentLoaded", function() {
+                                    const menuLinks = document.querySelectorAll("#menu-sub .menu-link");
+                                    const currentPath = window.location.pathname;
+
+                                    // Ganti ini jika route about kamu bukan '/about'
+                                    const aboutPath = "{{ parse_url(route('about'), PHP_URL_PATH) }}";
+
+                                    if (currentPath === aboutPath) {
+                                        function setActiveLinkByHash() {
+                                            const hash = window.location.hash;
+                                            menuLinks.forEach(link => {
+                                                link.classList.remove("active");
+                                                if (link.getAttribute("href").includes(hash)) {
+                                                    link.classList.add("active");
+                                                }
+                                            });
+                                        }
+
+                                        setActiveLinkByHash();
+
+                                        menuLinks.forEach(link => {
+                                            link.addEventListener("click", function() {
+                                                setTimeout(() => {
+                                                    setActiveLinkByHash();
+                                                }, 10);
+                                            });
+                                        });
+
+                                        window.addEventListener("hashchange", setActiveLinkByHash);
+                                    }
+                                });
+                            </script>
+
                         </div>
                         <!--end::Menu item-->
                         <!--begin::Menu item-->
-                        <div class="menu-item">
+                        {{-- <div class="menu-item">
                             <!--begin::Menu link-->
                             <a class="menu-link nav-link py-3 px-4 px-xxl-6 {{ Request::is('faqs') ? 'active' : '' }}"
                                 href="{{ route('faqs') }}" data-kt-scroll-toggle="true"
                                 data-kt-drawer-dismiss="true">FAQs</a>
                             <!--end::Menu link-->
-                        </div>
+                        </div> --}}
                         <!--end::Menu item-->
                         <!--begin::Menu item-->
                         <div class="menu-item d-flex d-md-none d-lg-none">

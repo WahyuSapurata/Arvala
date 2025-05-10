@@ -481,6 +481,15 @@ th[rowspan] {
     border: 1px solid #000 !important;
 }
 
+.tutorial {
+    margin-top: 90px;
+}
+
+.faq {
+    margin-top: 90px;
+}
+
+
 @media (max-width: 768px) {
     .custom-card {
         border-radius: 20px;
@@ -547,6 +556,14 @@ th[rowspan] {
         height: 90vh !important;
     } */
 
+    .tutorial {
+        margin-top: 30px;
+    }
+
+    .faq {
+        margin-top: 30px;
+    }
+
 }
 
 .select2-results__options {
@@ -568,4 +585,14 @@ th[rowspan] {
 
 .tabel-custom table {
     width: 2000px !important;
+}
+
+.chaport-container .chaport-launcher .chaport-launcher-button {
+    bottom: 85px !important;
+    right: 20px !important;
+}
+
+.chaport-container.chaport-container-positioned .chaport-window {
+    right: 90px !important;
+    bottom: 83px !important;
 }

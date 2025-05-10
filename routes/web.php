@@ -26,6 +26,8 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
 
     Route::get('/faqs', 'Landing@faqs')->name('faqs');
 
+    Route::get('/lisensi', 'Landing@lisensi')->name('lisensi');
+
     Route::group(['prefix' => 'login', 'middleware' => ['guest'], 'as' => 'login.'], function () {
         Route::get('/login-akun', 'Auth@show')->name('login-akun');
         Route::post('/login-proses', 'Auth@login_proses')->name('login-proses');
