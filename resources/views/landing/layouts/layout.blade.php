@@ -1075,7 +1075,7 @@
         <script type="text/javascript">
             (function(w, d, v3) {
                     w.chaportConfig = {
-                        appId: '681f6efdde04fe805e7a9fff',
+                        appId: '6821f9efcac554810491b12b',
 
                         @auth
                         visitor: {

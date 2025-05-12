@@ -109,7 +109,7 @@
                         editing <br> tutorials, to common troubleshooting.
                     </h3>
                 </div>
-                <div class="row mt-5">
+                <div class="row mt-5 gap-5">
                     <!--begin::Accordion-->
                     <div class="col-12 col-md-6">
                         <div class="accordion d-grid gap-5" id="kt_accordion_1">
@@ -123,7 +123,7 @@
                                 </h2>
                                 <div id="kt_accordion_1_body_1" class="accordion-collapse collapse show"
                                     aria-labelledby="kt_accordion_1_header_1" data-bs-parent="#kt_accordion_1">
-                                    <div class="accordion-body fs-md-5">
+                                    <div class="accordion-body fs-md-5 pt-0 pt-md-6">
                                         Our mockup is provided in PSD (Photoshop) file format,
                                         featuring fully editable layers. You can easily insert your own
                                         design into the mockup using Adobe Photoshop software.
@@ -141,7 +141,7 @@
                                 </h2>
                                 <div id="kt_accordion_1_body_2" class="accordion-collapse collapse"
                                     aria-labelledby="kt_accordion_1_header_2" data-bs-parent="#kt_accordion_1">
-                                    <div class="accordion-body fs-md-5">
+                                    <div class="accordion-body fs-md-5 pt-0 pt-md-6">
                                         Yes, all of our mockups are royalty-free. You may use them for both personal and
                                         commercial projects without any additional fees after your purchase (in accordance
                                         with
@@ -160,7 +160,7 @@
                                 </h2>
                                 <div id="kt_accordion_1_body_3" class="accordion-collapse collapse"
                                     aria-labelledby="kt_accordion_1_header_3" data-bs-parent="#kt_accordion_1">
-                                    <div class="accordion-body fs-md-5">
+                                    <div class="accordion-body fs-md-5 pt-0 pt-md-6">
                                         Yes, you may sell final designs created with our mockups, provided the original PSD
                                         source files are not included or resold (subject to license agreement).
                                     </div>
@@ -177,7 +177,7 @@
                                 </h2>
                                 <div id="kt_accordion_1_body_4" class="accordion-collapse collapse"
                                     aria-labelledby="kt_accordion_1_header_4" data-bs-parent="#kt_accordion_1">
-                                    <div class="accordion-body fs-md-5">
+                                    <div class="accordion-body fs-md-5 pt-0 pt-md-6">
                                         Yes, once purchased, you can use our mockups repeatedly without any limitations
                                         regarding duration or number of projects (in accordance with the license agreement).
                                     </div>
@@ -194,7 +194,7 @@
                                 </h2>
                                 <div id="kt_accordion_1_body_5" class="accordion-collapse collapse"
                                     aria-labelledby="kt_accordion_1_header_5" data-bs-parent="#kt_accordion_1">
-                                    <div class="accordion-body fs-md-5">
+                                    <div class="accordion-body fs-md-5 pt-0 pt-md-6">
                                         For large-scale usage or products intended for mass production and widespread
                                         resale,
                                         please contact us for further details.
@@ -217,7 +217,7 @@
                                 </h2>
                                 <div id="kt_accordion_2_body_6" class="accordion-collapse collapse"
                                     aria-labelledby="kt_accordion_2_header_6" data-bs-parent="#kt_accordion_2">
-                                    <div class="accordion-body fs-md-5">
+                                    <div class="accordion-body fs-md-5 pt-0 pt-md-6">
                                         Yes, we provide a short usage guide in PDF format, or you can view it here.
                                     </div>
                                 </div>
@@ -233,7 +233,7 @@
                                 </h2>
                                 <div id="kt_accordion_2_body_7" class="accordion-collapse collapse"
                                     aria-labelledby="kt_accordion_2_header_7" data-bs-parent="#kt_accordion_2">
-                                    <div class="accordion-body fs-md-5">
+                                    <div class="accordion-body fs-md-5 pt-0 pt-md-6">
                                         Please reach out to our support team via email or through the provided contact
                                         information. We are ready to help resolve any issues or answer your questions
                                         promptly.
@@ -251,7 +251,7 @@
                                 </h2>
                                 <div id="kt_accordion_2_body_8" class="accordion-collapse collapse"
                                     aria-labelledby="kt_accordion_2_header_8" data-bs-parent="#kt_accordion_2">
-                                    <div class="accordion-body fs-md-5">
+                                    <div class="accordion-body fs-md-5 pt-0 pt-md-6">
                                         Currently, our mockups are exclusively made for Adobe Photoshop to ensure optimal
                                         quality and ease of use. We do not guarantee compatibility with other software.
                                     </div>
@@ -268,7 +268,7 @@
                                 </h2>
                                 <div id="kt_accordion_2_body_9" class="accordion-collapse collapse"
                                     aria-labelledby="kt_accordion_2_header_9" data-bs-parent="#kt_accordion_2">
-                                    <div class="accordion-body fs-md-5">
+                                    <div class="accordion-body fs-md-5 pt-0 pt-md-6">
                                         Due to the digital nature of the product, refunds are generally not provided unless
                                         there are significant issues within the files we have provided. Please carefully
                                         review
