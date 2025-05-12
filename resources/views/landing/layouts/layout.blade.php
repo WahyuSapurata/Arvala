@@ -1076,14 +1076,15 @@
             (function(w, d, v3) {
                     w.chaportConfig = {
                         appId: '6821f9efcac554810491b12b',
+                        language: 'en'
+                    };
 
-                        @auth
-                        visitor: {
-                            name: "{{ auth()->user()->name }}",
-                            email: "{{ auth()->user()->email }}"
-                        }
-                    @endauth
-                };
+                    @auth
+                    w.chaportConfig.visitor = {
+                        name: "{{ auth()->user()->name }}",
+                        email: "{{ auth()->user()->email }}"
+                    };
+                @endauth
 
                 if (w.chaport) return; v3 = w.chaport = {}; v3._q = []; v3._l = {}; v3.q = function() {
                     v3._q.push(arguments)
