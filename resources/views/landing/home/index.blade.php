@@ -19,8 +19,7 @@
                             modern design standards.</h2>
                     </div>
                 </div>
-                <img src="{{ asset('Subtract.png') }}" loading="lazy" class="position-absolute top-0 end-0"
-                    data-aos="fade-left" data-aos-delay="400" data-aos-duration="1000" width="740px" alt="">
+                <img src="{{ asset('Subtract.png') }}" class="position-absolute top-0 end-0" width="740px" alt="">
             </div>
             {{-- <img src="{{ asset('bg-mobile.png') }}" class="w-100 backgriund-landing d-block d-md-none" loading="lazy"
                 style="height: 100%" alt=""> --}}
