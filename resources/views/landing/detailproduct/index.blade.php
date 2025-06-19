@@ -35,9 +35,12 @@
                             {!! $data->deskripsi !!}
                         </div>
                         <div class="d-grid">
-                            <a href="{{ $data->link }}" target="_blank"
-                                class="btn btn-primary rounded-pill text-white fw-bolder">{{ $data->price }}
-                                Buy Now</a>
+                            <a href="{{ $data->link }}" target="_blank" class="btn btn-primary rounded-pill fw-bolder"
+                                style="border: 2px solid transparent; transition: all 0.3s ease;"
+                                onmouseover="this.style.color='#794FFC'; this.style.borderColor='#794FFC'; this.style.backgroundColor='white';"
+                                onmouseout="this.style.color='white'; this.style.borderColor='transparent'; this.style.backgroundColor='#794FFC';">
+                                {{ $data->price == 0 ? 'Get Free' : $data->price . ' Buy Now' }}
+                            </a>
                             {{-- <a href="{{ $data->link }}" target="_blank"
                                 class="btn rounded-pill text-dark fw-bolder">Preview
                                 in browser <i class="bi bi-arrow-right-short fw-bold fs-1"></i></a> --}}
