@@ -58,13 +58,22 @@ class ProductController extends BaseController
             }
         }
 
+        // Untuk Kategory free
+        $price = $storeProductRequest->price;
+
+        // Get category data to check if it's free
+        $kategori = Kategori::where('uuid', $storeProductRequest->uuid_kategori)->first();
+        if ($kategori && strtolower($kategori->nama_kategori) === 'free') {
+            $price = 0;
+        }
+
         try {
             $data = new Product();
             $data->uuid_kategori = $storeProductRequest->uuid_kategori;
             $data->judul_product = $storeProductRequest->judul_product;
             $data->slug = Str::slug($storeProductRequest->judul_product);
             $data->thumbnail = $newThumbnail;
-            $data->price = $storeProductRequest->price;
+            $data->price = $price;
             $data->deskripsi = $storeProductRequest->deskripsi;
             $data->image_product = json_encode($imageDetails); // simpan array ke kolom JSON
             $data->meta = $storeProductRequest->meta;
