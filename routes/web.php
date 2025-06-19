@@ -51,6 +51,13 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
         Route::post('/update-product/{params}', 'ProductController@update')->name('update-product');
         Route::delete('/delete-product/{params}', 'ProductController@delete')->name('delete-product');
         Route::get('/button-product/{params}', 'ProductController@update_tombol')->name('button-product');
+
+        // Diskon Produk
+        Route::get('/diskon-produk', 'DiskonProdukController@index')->name('diskon.index');
+        Route::post('/diskon-produk/store', 'DiskonProdukController@store')->name('diskon.store');
+        Route::get('/diskon-produk/show/{uuid}', 'DiskonProdukController@show')->name('diskon.show');
+        Route::post('/diskon-produk/update/{uuid}', 'DiskonProdukController@update')->name('diskon.update');
+        Route::delete('/diskon-produk/delete/{uuid}', 'DiskonProdukController@destroy')->name('diskon.destroy');
     });
 
     Route::get('/logout', 'Auth@logout')->name('logout');
