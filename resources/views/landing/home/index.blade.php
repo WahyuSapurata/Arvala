@@ -57,7 +57,7 @@
             <div class="d-flex justify-content-between align-items-center mb-17">
                 <!--begin::Title-->
                 <h3 class="text-dark" id="how-it-works" data-kt-scroll-offset="{default: 100, lg: 150}">
-                    Latest Mockup</h3>
+                    Bundle Mockup</h3>
                 <a href="{{ route('shop') }}" class="btn btn-view-custom">View More <i
                         class="bi bi-arrow-right fs-4 ms-3"></i></a>
                 <!--end::Title-->
@@ -66,7 +66,44 @@
             <!--begin::Row-->
             <div class="row gy-10 mb-md-20">
 
-                @forelse ($latest_product as $latest)
+                @forelse ($bundle_product as $bundle)
+                    <!--begin::Col-->
+                    <div class="col-sm-12 col-md-6 col-lg-4">
+                        <!--begin::Card-->
+                        <a href="{{ route('detail-product', ['params' => $bundle->slug]) }}"
+                            class="card card-product border-0">
+                            <!--begin::Image-->
+                            <div class="position-relative overflow-hidden text-center bg-light rounded-3">
+                                <img src="{{ asset('public/product-thumbnail/' . $bundle->thumbnail) }}" loading="lazy"
+                                    class="w-100 rounded-2" alt="{{ $bundle->judul_product }}">
+                            </div>
+                            <!--end::Image-->
+
+                            <!--begin::Card Body-->
+                            <div class="card-body d-flex justify-content-between align-items-center px-0 pb-0">
+                                <div>
+                                    <h5 class="card-title fw-bolder">{{ $bundle->judul_product }}</h5>
+                                    <p class="text-muted small mb-2">{{ $bundle->kategori }}</p>
+                                </div>
+                                <span class="badge text-white px-4 py-3 rounded-pill fw-bolder"
+                                    style="background-color: #323232">{{ $bundle->price }}</span>
+                            </div>
+                            <!--end::Card Body-->
+                        </a>
+                        <!--end::Card-->
+                    </div>
+                    <!--end::Col-->
+                @empty
+                    <div class="card text-center shadow-sm">
+                        <div class="card-body">
+                            <i class="bi bi-box-seam display-4 text-muted"></i>
+                            <h5 class="card-title mt-3 text-muted">Tidak ada data</h5>
+                            <p class="text-muted">Silakan tambahkan data terlebih dahulu.</p>
+                        </div>
+                    </div>
+                @endforelse
+
+                {{-- @forelse ($latest_product as $latest)
                     <!--begin::Col-->
                     <div class="col-sm-12 col-md-6 col-lg-4">
                         <!--begin::Card-->
@@ -101,7 +138,7 @@
                             <p class="text-muted">Silakan tambahkan data terlebih dahulu.</p>
                         </div>
                     </div>
-                @endforelse
+                @endforelse --}}
 
             </div>
             <!--end::Row-->
@@ -118,7 +155,7 @@
             <div class="d-flex justify-content-between align-items-center mb-17">
                 <!--begin::Title-->
                 <h3 class="text-dark" id="how-it-works" data-kt-scroll-offset="{default: 100, lg: 150}">
-                    Bundle Mockup</h3>
+                    Free Mockup</h3>
                 <a href="{{ route('shop') }}" class="btn btn-view-custom">View More <i
                         class="bi bi-arrow-right fs-4 ms-3"></i></a>
                 <!--end::Title-->
@@ -127,27 +164,27 @@
             <!--begin::Row-->
             <div class="row gy-10 mb-md-20">
 
-                @forelse ($bundle_product as $bundle)
+                @forelse ($free_product as $free)
                     <!--begin::Col-->
                     <div class="col-sm-12 col-md-6 col-lg-4">
                         <!--begin::Card-->
-                        <a href="{{ route('detail-product', ['params' => $bundle->slug]) }}"
+                        <a href="{{ route('detail-product', ['params' => $free->slug]) }}"
                             class="card card-product border-0">
                             <!--begin::Image-->
                             <div class="position-relative overflow-hidden text-center bg-light rounded-3">
-                                <img src="{{ asset('public/product-thumbnail/' . $bundle->thumbnail) }}" loading="lazy"
-                                    class="w-100 rounded-2" alt="{{ $bundle->judul_product }}">
+                                <img src="{{ asset('public/product-thumbnail/' . $free->thumbnail) }}" loading="lazy"
+                                    class="w-100 rounded-2" alt="{{ $free->judul_product }}">
                             </div>
                             <!--end::Image-->
 
                             <!--begin::Card Body-->
                             <div class="card-body d-flex justify-content-between align-items-center px-0 pb-0">
                                 <div>
-                                    <h5 class="card-title fw-bolder">{{ $bundle->judul_product }}</h5>
-                                    <p class="text-muted small mb-2">{{ $bundle->kategori }}</p>
+                                    <h5 class="card-title fw-bolder">{{ $free->judul_product }}</h5>
+                                    <p class="text-muted small mb-2">{{ $free->kategori }}</p>
                                 </div>
                                 <span class="badge text-white px-4 py-3 rounded-pill fw-bolder"
-                                    style="background-color: #323232">{{ $bundle->price }}</span>
+                                    style="background-color: #323232">Free</span>
                             </div>
                             <!--end::Card Body-->
                         </a>
