@@ -8,7 +8,7 @@
             <!--begin::Logo-->
             <div class="d-flex align-items-center w-100 w-lg-auto justify-content-between">
                 <!--begin::Logo image-->
-                <a href="#">
+                <a href="{{ route('home') }}">
                     <div class="d-flex">
                         <img alt="Logo" src="{{ asset('logo_arvala.png') }}" class="logo-default h-20px h-lg-35px" />
                     </div>
