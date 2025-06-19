@@ -83,7 +83,9 @@
                                             <p class="text-muted small mb-2">{{ $item->kategori }}</p>
                                         </div>
                                         <span class="badge text-dark px-4 py-3 rounded-pill fw-bolder"
-                                            style="background-color: #F9FAFB">{{ $item->price }}</span>
+                                            style="background-color: #F9FAFB">
+                                            {{ $item->price == 0 ? 'Free' : $item->price }}
+                                        </span>
                                     </div>
                                 </a>
                             </div>
@@ -164,7 +166,9 @@
                                                 <p class="text-muted small mb-2">{{ $item->nama_kategori }}</p>
                                             </div>
                                             <span class="badge text-dark px-4 py-3 rounded-pill fw-bolder"
-                                                style="background-color: #F9FAFB">{{ $item->price }}</span>
+                                                style="background-color: #F9FAFB">
+                                                {{ $item->price == 0 ? 'Free' : $item->price }}
+                                            </span>
                                         </div>
                                     </a>
                                 </div>
