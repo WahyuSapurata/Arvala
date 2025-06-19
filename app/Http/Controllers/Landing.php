@@ -11,19 +11,8 @@ class Landing extends BaseController
     public function home()
     {
         $module = 'Home';
-        $latest_product = Product::latest()
-            ->take(10) // ambil lebih banyak dulu agar tidak terlalu cepat habis setelah filter
-            ->get()
-            ->filter(function ($product) {
-                $kategori = Kategori::where('uuid', $product->uuid_kategori)->first();
-                return $kategori && strtolower($kategori->nama_kategori) !== 'bundle';
-            })
-            ->take(6) // ambil hanya 6 setelah difilter
-            ->map(function ($product) {
-                $kategori = Kategori::where('uuid', $product->uuid_kategori)->first();
-                $product->kategori = $kategori ? $kategori->nama_kategori : '-';
-                return $product;
-            });
+
+        // Produk dengan kategori "bundle"
         $bundle_product = Product::latest()
             ->get()
             ->filter(function ($product) {
@@ -36,6 +25,22 @@ class Landing extends BaseController
                 $product->kategori = $kategori ? $kategori->nama_kategori : '-';
                 return $product;
             });
+
+        // Produk dengan kategori "free"
+        $free_product = Product::latest()
+            ->get()
+            ->filter(function ($product) {
+                $kategori = Kategori::where('uuid', $product->uuid_kategori)->first();
+                return $kategori && strtolower($kategori->nama_kategori) === 'free';
+            })
+            ->take(6)
+            ->map(function ($product) {
+                $kategori = Kategori::where('uuid', $product->uuid_kategori)->first();
+                $product->kategori = $kategori ? $kategori->nama_kategori : '-';
+                return $product;
+            });
+
+        // Produk lainnya, bukan kategori "bundle"
         $more_product = Product::take(10)
             ->get()
             ->filter(function ($product) {
@@ -48,7 +53,8 @@ class Landing extends BaseController
                 $product->kategori = $kategori ? $kategori->nama_kategori : '-';
                 return $product;
             });
-        return view('landing.home.index', compact('module', 'latest_product', 'bundle_product', 'more_product'));
+
+        return view('landing.home.index', compact('module', 'free_product', 'bundle_product', 'more_product'));
     }
 
     public function detail_product($params)
@@ -61,7 +67,17 @@ class Landing extends BaseController
     public function shop(Request $request)
     {
         $module = 'Shop';
-        $data_kategori = Kategori::all();
+        // Mengambil semua data kategori dan mengurutkannya
+        $data_kategori = Kategori::all()->sortBy(function ($kategori) {
+            // Memberikan prioritas untuk Bundle dan Free
+            if ($kategori->nama_kategori === 'Bundle') {
+                return '1_Bundle'; // Akan muncul pertama
+            } elseif ($kategori->nama_kategori === 'Free') {
+                return '2_Free'; // Akan muncul kedua
+            } else {
+                return '3_' . $kategori->nama_kategori; // Sisanya diurutkan alfabetis
+            }
+        });
 
         // Produk untuk tab "All"
         $product = Product::when($request->search, function ($query) use ($request) {
