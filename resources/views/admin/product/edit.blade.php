@@ -107,19 +107,19 @@
                                 </div>
 
                                 <div class="mb-10">
-                                    <label class="form-label">Price ($)</label>
-                                    <input type="text" id="price" class="form-control" name="price"
-                                        value="{{ $data->price }}" placeholder="$0.00">
-                                    <small class="text-danger price_error"></small>
-                                </div>
-
-                                <div class="mb-10">
                                     <label class="form-label">Kategori</label>
                                     <select name="uuid_kategori" class="form-select" data-control="select2"
                                         value="{{ $data->uuid_kategori }}" id="from_select_kategori"
                                         data-placeholder="Pilih jenis inputan">
                                     </select>
                                     <small class="text-danger uuid_kategori_error"></small>
+                                </div>
+
+                                <div class="mb-10">
+                                    <label class="form-label">Price ($)</label>
+                                    <input type="text" id="price" class="form-control" name="price"
+                                        value="{{ $data->price }}" placeholder="$0.00">
+                                    <small class="text-danger price_error"></small>
                                 </div>
 
                                 <div class="mb-10">
@@ -200,14 +200,34 @@
         let control = new Control();
 
         var currentPath = window.location.pathname;
-        var pathParts = currentPath.split('/'); // Membagi path menggunakan karakter '/'
-        var lastPart = pathParts[pathParts.length - 1]; // Mengambil elemen terakhir dari array
+        var pathParts = currentPath.split('/');
+        var lastPart = pathParts[pathParts.length - 1];
 
         var options = {
             selector: "#deskripsi",
             height: "480"
         };
         tinymce.init(options);
+
+        // Format price input (sama seperti form add)
+        $('#price').on('input', function() {
+            let value = $(this).val().replace(/[^0-9.]/g, ''); // Hanya angka dan titik
+            $(this).val(value); // Biarkan user memasukkan angka tanpa langsung format
+        });
+
+        $('#price').on('blur', function() {
+            let value = $(this).val();
+            let floatValue = parseFloat(value);
+
+            if (!isNaN(floatValue)) {
+                $(this).val('$' + floatValue.toLocaleString('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }));
+            } else {
+                $(this).val(''); // Kosongkan jika input tidak valid
+            }
+        });
 
         $(document).on('click', '#button-side-form', function() {
             window.history.back();
@@ -225,7 +245,9 @@
             uploadMultiple: true,
             parallelUploads: 10,
             maxFiles: 10,
+            maxFilesize: 10,
             paramName: "image_product[]",
+            acceptedFiles: "image/*",
             addRemoveLinks: true,
             init: function() {
                 let dz = this;
@@ -278,12 +300,43 @@
             }
         });
 
+        // Variable to store category data
+        let categoryData = [];
+
+        // Function to toggle price field visibility (sama seperti form add)
+        function togglePriceField(selectedUuid) {
+            const priceContainer = $('.mb-10').has('#price');
+
+            // Find the selected category data
+            const selectedCategory = categoryData.find(cat => cat.uuid === selectedUuid);
+
+            if (selectedCategory && selectedCategory.nama_kategori.toLowerCase() === 'free') {
+                $('#price').prop('disabled', true); // Disable price field
+                $('#price').val('$0'); // Set price value to 0 with format
+            } else {
+                $('#price').prop('disabled', false); // Enable price field
+            }
+        }
+
+        // Add event listener for category selection change
+        $(document).on('change', '#from_select_kategori', function() {
+            const selectedUuid = $(this).val();
+            togglePriceField(selectedUuid);
+        });
+
         // Submit form
         $(document).on('submit', ".form-data", function(e) {
             e.preventDefault();
 
             const form = $(".form-data")[0];
             const formData = new FormData(form);
+
+            // Check if category is free, set price to 0 or remove price field
+            const selectedUuid = $('#from_select_kategori').val();
+            const selectedCategory = categoryData.find(cat => cat.uuid === selectedUuid);
+            if (selectedCategory && selectedCategory.nama_kategori.toLowerCase() === 'free') {
+                formData.set('price', '0'); // Set price to 0 for free products
+            }
 
             // Tambah file baru dari Dropzone
             myDropzone.files.forEach(file => {
@@ -311,7 +364,7 @@
                 processData: false,
                 success: function(response) {
                     $(".text-danger").html("");
-                    if (response.success) {
+                    if (response.success == true) {
                         swal.fire({
                             text: `Product berhasil di Edit`,
                             icon: "success",
@@ -320,11 +373,19 @@
                         }).then(function() {
                             window.location.href = '/admin/product';
                         });
+                    } else {
+                        swal.fire({
+                            title: response.message,
+                            text: response.data,
+                            icon: "warning",
+                            showConfirmButton: false,
+                            timer: 1500,
+                        });
                     }
                 },
                 error: function(xhr) {
                     $(".text-danger").html("");
-                    $.each(xhr.responseJSON.errors, function(key, value) {
+                    $.each(xhr.responseJSON["errors"], function(key, value) {
                         $(`.${key}_error`).html(value);
                     });
                 },
@@ -336,19 +397,23 @@
                 url: "{{ route('admin.kategori-get') }}",
                 method: "GET",
                 success: function(res) {
-                    console.log(res);
+                    // Store category data globally
+                    categoryData = res.data;
 
-                    let html = ""; // Inisialisasi html di awal
-                    let selectedKategori =
-                        @json($data->uuid_kategori); // Ambil nilai dengan aman dari Blade ke JS
+                    let html = "";
+                    let selectedKategori = @json($data->uuid_kategori);
 
                     $.each(res.data, function(x, y) {
-                        let selected = y.uuid == selectedKategori ? "selected" :
-                            ""; // Cek apakah harus selected
+                        let selected = y.uuid == selectedKategori ? "selected" : "";
                         html += `<option value="${y.uuid}" ${selected}>${y.nama_kategori}</option>`;
                     });
 
                     $('#from_select_kategori').html(html);
+
+                    // Check initial category after loading
+                    if (selectedKategori) {
+                        togglePriceField(selectedKategori);
+                    }
                 },
                 error: function(xhr) {
                     alert("Gagal mengambil data kategori.");

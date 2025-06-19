@@ -84,18 +84,18 @@
                                 </div>
 
                                 <div class="mb-10">
-                                    <label class="form-label">Price ($)</label>
-                                    <input type="text" id="price" class="form-control" name="price"
-                                        placeholder="$0.00">
-                                    <small class="text-danger price_error"></small>
-                                </div>
-
-                                <div class="mb-10">
                                     <label class="form-label">Kategori</label>
                                     <select name="uuid_kategori" class="form-select" data-control="select2"
                                         id="from_select_kategori" data-placeholder="Pilih jenis inputan">
                                     </select>
                                     <small class="text-danger uuid_kategori_error"></small>
+                                </div>
+
+                                <div class="mb-10">
+                                    <label class="form-label">Price ($)</label>
+                                    <input type="text" id="price" class="form-control" name="price"
+                                        placeholder="$0.00">
+                                    <small class="text-danger price_error"></small>
                                 </div>
 
                                 <div class="mb-10">
@@ -211,11 +211,42 @@
             acceptedFiles: "image/*"
         });
 
+        // Variable to store category data
+        let categoryData = [];
+
+        // Function to toggle price field visibility
+        function togglePriceField(selectedUuid) {
+            const priceContainer = $('.mb-10').has('#price'); // Find the container with price input
+
+            // Find the selected category data
+            const selectedCategory = categoryData.find(cat => cat.uuid === selectedUuid);
+
+            if (selectedCategory && selectedCategory.nama_kategori.toLowerCase() === 'free') {
+                $('#price').prop('disabled', true); // Disable price field
+                $('#price').val('$0'); // Set price value to 0
+            } else {
+                $('#price').prop('disabled', false); // Enable price field
+            }
+        }
+
+        // Add event listener for category selection change
+        $(document).on('change', '#from_select_kategori', function() {
+            const selectedUuid = $(this).val();
+            togglePriceField(selectedUuid);
+        });
+
         $(document).on('submit', ".form-data", function(e) {
             e.preventDefault();
 
             let form = $(this)[0];
             let formData = new FormData(form);
+
+            // Check if category is free, set price to 0 or remove price field
+            const selectedUuid = $('#from_select_kategori').val();
+            const selectedCategory = categoryData.find(cat => cat.uuid === selectedUuid);
+            if (selectedCategory && selectedCategory.nama_kategori.toLowerCase() === 'free') {
+                formData.set('price', '0'); // Set price to 0 for free products
+            }
 
             // Append file dari Dropzone ke FormData
             dropzone.getAcceptedFiles().forEach((file, i) => {
@@ -250,7 +281,9 @@
                     } else {
                         $("form")[0].reset();
                         dropzone.removeAllFiles();
-                        $("#from_select").val(null).trigger("change");
+                        $("#from_select_kategori").val(null).trigger("change");
+                        // Reset price field visibility
+                        $('.mb-10').has('#price').show();
                         swal.fire({
                             title: response.message,
                             text: response.data,
@@ -274,6 +307,8 @@
                 url: "{{ route('admin.kategori-get') }}",
                 method: "GET",
                 success: function(res) {
+                    // Store category data globally
+                    categoryData = res.data;
 
                     $('#from_select_kategori').html("");
                     let html = "<option selected disabled>Pilih jenis inputan</option>";
