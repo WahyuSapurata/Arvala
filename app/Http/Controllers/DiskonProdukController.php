@@ -22,7 +22,27 @@ class DiskonProdukController extends Controller
         }
     }
 
-    // Alternatif Controller dengan UUID eksplisit
+    // Method untuk mengecek apakah produk sudah memiliki diskon
+    public function checkProductDiscount($productUuid)
+    {
+        try {
+            $diskon = DiskonProduk::where('uuid_produk', $productUuid)
+                                ->where('akhir_tanggal', '>', now())
+                                ->first();
+
+            return response()->json([
+                'has_discount' => $diskon ? true : false,
+                'discount_data' => $diskon ? [
+                    'uuid' => $diskon->uuid,
+                    'diskon_persen' => $diskon->diskon_persen,
+                    'akhir_tanggal' => $diskon->akhir_tanggal->format('Y-m-d\TH:i'),
+                ] : null
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Gagal mengecek diskon produk'], 500);
+        }
+    }
+
     public function store(Request $request)
     {
         try {
@@ -31,6 +51,18 @@ class DiskonProdukController extends Controller
                 'diskon_persen' => 'required|numeric|min:1|max:100',
                 'akhir_tanggal' => 'required|date|after:now',
             ]);
+
+            // Cek apakah produk sudah memiliki diskon aktif
+            $existingDiscount = DiskonProduk::where('uuid_produk', $request->product_uuid)
+                                        ->where('akhir_tanggal', '>', now())
+                                        ->first();
+
+            if ($existingDiscount) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Produk ini sudah memiliki diskon aktif. Silakan edit diskon yang ada atau tunggu hingga diskon berakhir.'
+                ], 422);
+            }
 
             // Konversi format datetime
             $akhir_tanggal = Carbon::createFromFormat('Y-m-d\TH:i', $request->akhir_tanggal);
@@ -73,32 +105,44 @@ class DiskonProdukController extends Controller
 
     public function update(Request $request, $uuid)
     {
-        $validator = Validator::make($request->all(), [
-            'discount_percentage' => 'required|integer|min:1|max:100',
-            'discount_end_date' => 'required|date|after:today'
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
-        }
-
         try {
+            $validated = $request->validate([
+                'diskon_persen' => 'required|numeric|min:1|max:100',
+                'akhir_tanggal' => 'required|date|after:now',
+            ]);
+
             DB::beginTransaction();
 
             $diskon = DiskonProduk::where('uuid', $uuid)->first();
-            if (!$diskon) return response()->json(['success' => false, 'message' => 'Diskon tidak ditemukan'], 404);
+            if (!$diskon) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Diskon tidak ditemukan'
+                ], 404);
+            }
+
+            // Konversi format datetime
+            $akhir_tanggal = Carbon::createFromFormat('Y-m-d\TH:i', $request->akhir_tanggal);
 
             $diskon->update([
-                'diskon_persen' => $request->discount_percentage,
-                'akhir_tanggal' => Carbon::parse($request->discount_end_date)->endOfDay()
+                'diskon_persen' => $request->diskon_persen,
+                'akhir_tanggal' => $akhir_tanggal
             ]);
 
             DB::commit();
-            return response()->json(['success' => true, 'message' => 'Diskon berhasil diupdate', 'data' => $diskon->load('product')]);
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Diskon berhasil diupdate'
+            ]);
 
         } catch (\Exception $e) {
             DB::rollback();
-            return response()->json(['success' => false, 'message' => 'Gagal mengupdate diskon: ' . $e->getMessage()], 500);
+            \Log::error('Error updating discount: ' . $e->getMessage());
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Gagal mengupdate diskon: ' . $e->getMessage()
+            ], 500);
         }
     }
 
@@ -115,6 +159,4 @@ class DiskonProdukController extends Controller
             return response()->json(['success' => false, 'message' => 'Gagal menghapus diskon: ' . $e->getMessage()], 500);
         }
     }
-
-
 }
