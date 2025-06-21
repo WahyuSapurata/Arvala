@@ -76,6 +76,13 @@
                             <div class="position-relative overflow-hidden text-center bg-light rounded-3">
                                 <img src="{{ asset('public/product-thumbnail/' . $bundle->thumbnail) }}" loading="lazy"
                                     class="w-100 rounded-2" alt="{{ $bundle->judul_product }}">
+                                {{-- Badge diskon jika ada --}}
+                                @if ($bundle->diskon && $bundle->diskon->akhir_tanggal->isFuture())
+                                    <span class="position-absolute top-0 end-0 m-2 badge rounded-md"
+                                        style="background-color: #774CFB; font-weight: 600; font-size: 14px;">
+                                        {{ $bundle->diskon->diskon_persen }}% Off
+                                    </span>
+                                @endif
                             </div>
                             <!--end::Image-->
 
@@ -85,8 +92,30 @@
                                     <h5 class="card-title fw-bolder">{{ $bundle->judul_product }}</h5>
                                     <p class="text-muted small mb-2">{{ $bundle->kategori }}</p>
                                 </div>
-                                <span class="badge text-white px-4 py-3 rounded-pill fw-bolder"
-                                    style="background-color: #323232">{{ $bundle->price }}</span>
+
+                                <div class="text-end">
+                                    @if ($bundle->discount_percentage > 0)
+                                        <div class="d-flex flex-column align-items-end">
+                                            <!-- Original Price (Top) -->
+                                            <span class="text-muted text-decoration-line-through mb-1"
+                                                style="font-size: 14px; font-style: italic">
+                                                ${{ number_format($bundle->original_price, 2, '.', '') }}
+                                            </span>
+
+                                            <!-- Discounted Price (Bottom) - Larger -->
+                                            <span class="badge text-primary py-3 rounded-pill fw-bolder"
+                                                style="font-size: 1.2rem; padding: 0%">
+                                                ${{ number_format($bundle->final_price, 2, '.', '') }}
+                                            </span>
+                                        </div>
+                                    @else
+                                        <!-- Regular Price (No discount) -->
+                                        <span class="badge text-primary px-4 py-3 rounded-pill fw-bolder"
+                                            style="font-size: 1.2rem;">
+                                            ${{ number_format($bundle->final_price, 2, '.', '') }}
+                                        </span>
+                                    @endif
+                                </div>
                             </div>
                             <!--end::Card Body-->
                         </a>
@@ -122,7 +151,7 @@
                                     <h5 class="card-title fw-bolder">{{ $latest->judul_product }}</h5>
                                     <p class="text-muted small mb-2">{{ $latest->kategori }}</p>
                                 </div>
-                                <span class="badge text-white px-4 py-3 rounded-pill fw-bolder"
+                                <span class="badge text-primary px-4 py-3 rounded-pill fw-bolder"
                                     style="background-color: #323232">{{ $latest->price }}</span>
                             </div>
                             <!--end::Card Body-->
@@ -183,8 +212,30 @@
                                     <h5 class="card-title fw-bolder">{{ $free->judul_product }}</h5>
                                     <p class="text-muted small mb-2">{{ $free->kategori }}</p>
                                 </div>
-                                <span class="badge text-white px-4 py-3 rounded-pill fw-bolder"
-                                    style="background-color: #323232">Free</span>
+                                <div class="text-end">
+                                    @if ($free->final_price == 0)
+                                        <span class="badge text-primary px-4 py-3 rounded-pill fw-bolder"
+                                            style="background-color: transparent; font-size: 1.2rem;">
+                                            Free
+                                        </span>
+                                    @elseif ($free->discount_percentage > 0)
+                                        <div class="d-flex flex-column align-items-end">
+                                            <span class="text-muted text-decoration-line-through mb-1"
+                                                style="font-size: 14px;">
+                                                ${{ number_format($free->original_price, 2, '.', '') }}
+                                            </span>
+                                            <span class="badge text-primary py-3 rounded-pill fw-bolder"
+                                                style="font-size: 1.2rem; padding: 0%">
+                                                ${{ number_format($free->final_price, 2, '.', '') }}
+                                            </span>
+                                        </div>
+                                    @else
+                                        <span class="badge text-primary px-4 py-3 rounded-pill fw-bolder"
+                                            style="font-size: 1.2rem;">
+                                            ${{ number_format($free->final_price, 2, '.', '') }}
+                                        </span>
+                                    @endif
+                                </div>
                             </div>
                             <!--end::Card Body-->
                         </a>
@@ -195,8 +246,8 @@
                     <div class="card text-center shadow-sm">
                         <div class="card-body">
                             <i class="bi bi-box-seam display-4 text-muted"></i>
-                            <h5 class="card-title mt-3 text-muted">Tidak ada data</h5>
-                            <p class="text-muted">Silakan tambahkan data terlebih dahulu.</p>
+                            <h5 class="card-title mt-3 text-muted">No free products available</h5>
+                            <p class="text-muted">Please check back later for free mockups.</p>
                         </div>
                     </div>
                 @endforelse
@@ -226,42 +277,62 @@
             <div class="row gy-10 mb-md-20">
 
                 @forelse ($more_product as $more)
-                    <!--begin::Col-->
                     <div class="col-sm-12 col-md-6 col-lg-4">
-                        <!--begin::Card-->
                         <a href="{{ route('detail-product', ['params' => $more->slug]) }}"
                             class="card card-product border-0">
-                            <!--begin::Image-->
                             <div class="position-relative overflow-hidden text-center bg-light rounded-3">
                                 <img src="{{ asset('public/product-thumbnail/' . $more->thumbnail) }}" loading="lazy"
                                     class="w-100 rounded-2" alt="{{ $more->judul_product }}">
+                                @if ($more->diskon && $more->diskon->akhir_tanggal->isFuture())
+                                    <span class="position-absolute top-0 end-0 m-2 badge rounded-md"
+                                        style="background-color: #774CFB; font-weight: 600; font-size: 14px;">
+                                        {{ $more->diskon->diskon_persen }}% Off
+                                    </span>
+                                @endif
                             </div>
-                            <!--end::Image-->
 
-                            <!--begin::Card Body-->
                             <div class="card-body d-flex justify-content-between align-items-center px-0 pb-0">
                                 <div>
                                     <h5 class="card-title fw-bolder">{{ $more->judul_product }}</h5>
                                     <p class="text-muted small mb-2">{{ $more->kategori }}</p>
                                 </div>
-                                <span class="badge text-white px-4 py-3 rounded-pill fw-bolder"
-                                    style="background-color: #323232">{{ $more->price }}</span>
+
+                                <div class="text-end">
+                                    @if ($more->final_price == 0)
+                                        <span class="badge text-primary px-4 py-3 rounded-pill fw-bolder"
+                                            style="background-color: transparent; font-size: 1.2rem;">
+                                            Free
+                                        </span>
+                                    @elseif ($more->discount_percentage > 0)
+                                        <div class="d-flex flex-column align-items-end">
+                                            <span class="text-muted text-decoration-line-through mb-1"
+                                                style="font-size: 14px; font-style: italic">
+                                                ${{ number_format($more->original_price, 2, '.', '') }}
+                                            </span>
+                                            <span class="badge text-primary py-3 rounded-pill fw-bolder"
+                                                style="font-size: 1.2rem; padding: 0%">
+                                                ${{ number_format($more->final_price, 2, '.', '') }}
+                                            </span>
+                                        </div>
+                                    @else
+                                        <span class="badge text-primary px-4 py-3 rounded-pill fw-bolder"
+                                            style="font-size: 1.2rem;">
+                                            ${{ number_format($more->final_price, 2, '.', '') }}
+                                        </span>
+                                    @endif
+                                </div>
                             </div>
-                            <!--end::Card Body-->
                         </a>
-                        <!--end::Card-->
                     </div>
-                    <!--end::Col-->
                 @empty
                     <div class="card text-center shadow-sm">
                         <div class="card-body">
                             <i class="bi bi-box-seam display-4 text-muted"></i>
-                            <h5 class="card-title mt-3 text-muted">Tidak ada data</h5>
-                            <p class="text-muted">Silakan tambahkan data terlebih dahulu.</p>
+                            <h5 class="card-title mt-3 text-muted">No products available</h5>
+                            <p class="text-muted">Please check back later.</p>
                         </div>
                     </div>
                 @endforelse
-
             </div>
             <!--end::Row-->
         </div>
