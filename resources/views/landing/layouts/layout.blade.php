@@ -8,9 +8,9 @@
     <meta charset="utf-8" />
     <!-- SEO Meta Tags -->
     <meta name="description"
-        content="Kilq is a high-quality product mockup template designed for creators and entrepreneurs to showcase and sell digital goods with a professional touch.">
+        content="Arvala is a high-quality product mockup template designed for creators and entrepreneurs to showcase and sell digital goods with a professional touch.">
     <meta name="keywords"
-        content="Kilq, arvala, mockup, product mockup, digital mockup, mockup template, digital goods, professional mockup, mockup for creators, mockup marketplace, product presentation, sell digital products, customizable mockup templates, premium mockup design, creative product showcase">
+        content="Arvala, arvala, mockup, product mockup, digital mockup, mockup template, digital goods, professional mockup, mockup for creators, mockup marketplace, product presentation, sell digital products, customizable mockup templates, premium mockup design, creative product showcase">
 
     <!-- Viewport & Security -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -19,13 +19,13 @@
     <!-- Open Graph / Facebook -->
     <meta property="og:locale" content="en_US">
     <meta property="og:type" content="website">
-    <meta property="og:title" content="Kilq – Professional Product Mockup Template for Digital Goods">
+    <meta property="og:title" content="Arvala – Professional Product Mockup Template for Digital Goods">
     <meta property="og:description"
-        content="Showcase your digital products professionally with Kilq – a powerful and customizable product mockup template built for creators and online entrepreneurs.">
+        content="Showcase your digital products professionally with Arvala – a powerful and customizable product mockup template built for creators and online entrepreneurs.">
     <meta property="og:url" content="https://arvalamockup.com/">
-    <meta property="og:site_name" content="Kilq Mockup">
+    <meta property="og:site_name" content="Arvala Mockup">
     <meta property="og:image" content="https://arvalamockup.com/logo_arvala.png">
-    <meta property="og:image:alt" content="Kilq Mockup Preview">
+    <meta property="og:image:alt" content="Arvala Mockup Preview">
 
     <!-- Canonical URL -->
     <link rel="canonical" href="https://arvalamockup.com/">
@@ -44,18 +44,19 @@
     <link href="{{ asset('assets/css/style.bundle.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('assets/css/style.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('assets/aos/dist/aos.css') }}" rel="stylesheet" type="text/css" />
+
     <!--end::Global Stylesheets Bundle-->
 
     <script type="application/ld+json">
         {
           "@context": "https://schema.org",
           "@type": "WebSite",
-          "name": "Kilq Mockup",
+          "name": "Mockup",
           "url": "https://arvalamockup.com/",
-          "description": "Kilq is a professional product mockup template designed for creators and entrepreneurs to present and sell digital goods with high-quality visuals.",
+          "description": "Arvala is a professional product mockup template designed for creators and entrepreneurs to present and sell digital goods with high-quality visuals.",
           "publisher": {
             "@type": "Organization",
-            "name": "Kilq Mockup",
+            "name": "Arvala Mockup",
             "logo": {
               "@type": "ImageObject",
               "url": "https://arvalamockup.com/logo_arvala.png"
