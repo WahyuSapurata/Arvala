@@ -76,16 +76,42 @@
                                     <div class="position-relative overflow-hidden text-center bg-light rounded-3">
                                         <img src="{{ asset('public/product-thumbnail/' . $item->thumbnail) }}"
                                             loading="lazy" class="w-100 rounded-2" alt="{{ $item->judul_product }}">
+                                        @if ($item->diskon && $item->diskon->akhir_tanggal->isFuture())
+                                            <span class="position-absolute top-0 end-0 m-2 badge rounded-md"
+                                                style="background-color: #774CFB; font-weight: 600; font-size: 14px;">
+                                                {{ $item->diskon->diskon_persen }}% Off
+                                            </span>
+                                        @endif
                                     </div>
                                     <div class="card-body d-flex justify-content-between align-items-center px-0 pb-0">
                                         <div>
                                             <h5 class="card-title fw-bolder">{{ $item->judul_product }}</h5>
                                             <p class="text-muted small mb-2">{{ $item->kategori }}</p>
                                         </div>
-                                        <span class="badge text-dark px-4 py-3 rounded-pill fw-bolder"
-                                            style="background-color: #F9FAFB">
-                                            {{ $item->price == 0 ? 'Free' : $item->price }}
-                                        </span>
+                                        <div class="text-end">
+                                            @if ($item->final_price == 0)
+                                                <span class="badge text-primary px-4 py-3 rounded-pill fw-bolder"
+                                                    style="background-color: transparent; font-size: 1.2rem;">
+                                                    Free
+                                                </span>
+                                            @elseif ($item->discount_percentage > 0)
+                                                <div class="d-flex flex-column align-items-end">
+                                                    <span class="text-muted text-decoration-line-through mb-1"
+                                                        style="font-size: 14px; font-style: italic">
+                                                        ${{ number_format($item->original_price, 2, '.', '') }}
+                                                    </span>
+                                                    <span class="badge text-primary py-3 rounded-pill fw-bolder"
+                                                        style="font-size: 1.2rem; padding: 0%">
+                                                        ${{ number_format($item->final_price, 2, '.', '') }}
+                                                    </span>
+                                                </div>
+                                            @else
+                                                <span class="badge text-white px-4 py-3 rounded-pill fw-bolder"
+                                                    style="background-color: #323232; font-size: 1.2rem;">
+                                                    ${{ number_format($item->final_price, 2, '.', '') }}
+                                                </span>
+                                            @endif
+                                        </div>
                                     </div>
                                 </a>
                             </div>
@@ -159,16 +185,42 @@
                                         <div class="position-relative overflow-hidden text-center bg-light rounded-3">
                                             <img src="{{ asset('public/product-thumbnail/' . $item->thumbnail) }}"
                                                 loading="lazy" class="w-100 rounded-2" alt="{{ $item->judul_product }}">
+                                            @if ($item->diskon && $item->diskon->akhir_tanggal->isFuture())
+                                                <span class="position-absolute top-0 end-0 m-2 badge rounded-md"
+                                                    style="background-color: #774CFB; font-weight: 600; font-size: 14px;">
+                                                    {{ $item->diskon->diskon_persen }}% Off
+                                                </span>
+                                            @endif
                                         </div>
                                         <div class="card-body d-flex justify-content-between align-items-center px-0 pb-0">
                                             <div>
                                                 <h5 class="card-title fw-bolder">{{ $item->judul_product }}</h5>
                                                 <p class="text-muted small mb-2">{{ $item->nama_kategori }}</p>
                                             </div>
-                                            <span class="badge text-dark px-4 py-3 rounded-pill fw-bolder"
-                                                style="background-color: #F9FAFB">
-                                                {{ $item->price == 0 ? 'Free' : $item->price }}
-                                            </span>
+                                            <div class="text-end">
+                                                @if ($item->final_price == 0)
+                                                    <span class="badge text-primary px-4 py-3 rounded-pill fw-bolder"
+                                                        style="background-color: transparent; font-size: 1.2rem;">
+                                                        Free
+                                                    </span>
+                                                @elseif ($item->discount_percentage > 0)
+                                                    <div class="d-flex flex-column align-items-end">
+                                                        <span class="text-muted text-decoration-line-through mb-1"
+                                                            style="font-size: 14px; font-style: italic">
+                                                            ${{ number_format($item->original_price, 2, '.', '') }}
+                                                        </span>
+                                                        <span class="badge text-primary py-3 rounded-pill fw-bolder"
+                                                            style="font-size: 1.2rem; padding: 0%">
+                                                            ${{ number_format($item->final_price, 2, '.', '') }}
+                                                        </span>
+                                                    </div>
+                                                @else
+                                                    <span class="badge text-white px-4 py-3 rounded-pill fw-bolder"
+                                                        style="background-color: #323232; font-size: 1.2rem;">
+                                                        ${{ number_format($item->final_price, 2, '.', '') }}
+                                                    </span>
+                                                @endif
+                                            </div>
                                         </div>
                                     </a>
                                 </div>
@@ -184,7 +236,6 @@
                         </div>
                     </div>
                 @endforeach
-
             </div>
         </div>
     </div>
