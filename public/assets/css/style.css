@@ -29,9 +29,9 @@ th[rowspan] {
     padding: 30px;
 }
 
-.header_jumbotron>img,
-.header_jumbotron>span,
-.header_jumbotron>h4 {
+.header_jumbotron > img,
+.header_jumbotron > span,
+.header_jumbotron > h4 {
     display: inline-block;
 }
 
@@ -73,7 +73,7 @@ th[rowspan] {
 }
 
 .frame-box p {
-    color: #0B4D27;
+    color: #0b4d27;
     font-feature-settings: "clig" off, "liga" off;
     font-family: Red Hat Display;
     font-size: 20px;
@@ -363,7 +363,7 @@ th[rowspan] {
 
 .content-subdeskripsi {
     padding: 0 100px;
-    text-align: justify
+    text-align: justify;
 }
 
 .content-benefit {
@@ -372,7 +372,7 @@ th[rowspan] {
 
 .content-eventdetail {
     padding: 0 100px;
-    text-align: justify
+    text-align: justify;
 }
 
 .video-detail {
@@ -399,7 +399,7 @@ th[rowspan] {
 }
 
 .btn-view-custom:hover {
-    background-color: #7E36F4;
+    background-color: #7e36f4;
     color: white;
     font-weight: bold;
 }
@@ -427,12 +427,12 @@ th[rowspan] {
 
 .btn-outline-custom a {
     color: #575757 !important;
-    border: 1px solid #5A5A5A !important;
+    border: 1px solid #5a5a5a !important;
 }
 
 .btn-outline-custom .active {
-    color: #FFFFFF !important;
-    border: 1px solid #794FFC !important;
+    color: #ffffff !important;
+    border: 1px solid #794ffc !important;
     font-weight: 700;
 }
 
@@ -460,15 +460,15 @@ th[rowspan] {
     /* Warna track scrollbar */
 }
 
-.pagination .active>.page-link,
+.pagination .active > .page-link,
 .page-link.active {
-    background-color: #794FFC;
+    background-color: #794ffc;
     color: #fff;
-    border-color: #794FFC;
+    border-color: #794ffc;
 }
 
 .pagination .page-link {
-    color: #794FFC;
+    color: #794ffc;
 }
 
 .pagination .page-link:focus {
@@ -488,7 +488,6 @@ th[rowspan] {
 .faq {
     margin-top: 90px;
 }
-
 
 @media (max-width: 768px) {
     .custom-card {
@@ -563,7 +562,6 @@ th[rowspan] {
     .faq {
         margin-top: 30px;
     }
-
 }
 
 .select2-results__options {
@@ -595,4 +593,101 @@ th[rowspan] {
 .chaport-container.chaport-container-positioned .chaport-window {
     right: 90px !important;
     bottom: 83px !important;
+}
+
+.nav-kategori-scroll {
+    display: flex;
+    overflow-x: auto;
+    gap: 12px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    white-space: nowrap;
+    position: relative;
+}
+
+.tab-btn {
+    padding: 10px 16px;
+    border: 1px solid #ccc;
+    background-color: white;
+    color: #333;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
+    white-space: nowrap;
+    transition: all 0.3s;
+}
+
+.tab-btn:hover,
+.tab-btn.active {
+    background-color: #8057fc;
+    color: white;
+    border-color: #8057fc;
+}
+
+.dropdown-kategori {
+    position: relative;
+    z-index: 100;
+}
+
+.dropdown-kategori .dropdown-content {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: white;
+    z-index: 9999; /* pastikan sangat tinggi */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+    display: none;
+}
+
+.dropdown-kategori:hover .dropdown-content {
+    display: block;
+}
+
+.dropdown-content li {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.dropdown-content li button {
+    width: 100%;
+    text-align: left;
+    padding: 10px 20px;
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+.dropdown-content li button:hover {
+    background-color: #f2f2f2;
+}
+
+/* Default state for all nav links in this component */
+.nav-pills-custom .nav-link {
+    color: #4e4e4e;
+    font-weight: normal;
+    background-color: transparent;
+    border: none;
+}
+
+/* Active state for nav links and the dropdown toggle */
+.nav-pills-custom .nav-link.active,
+.nav-pills-custom .show > .nav-link {
+    /* .show>.nav-link is for the dropdown toggle */
+    color: #7e36f4 !important;
+    font-weight: bold !important;
+    background-color: transparent !important;
+}
+
+/* Active state for items inside the dropdown */
+.dropdown-menu .dropdown-item.active,
+.dropdown-menu .dropdown-item:active {
+    color: #7e36f4 !important;
+    background-color: transparent !important;
+}
+
+/* Inactive items in dropdown */
+.dropdown-menu .dropdown-item:not(.active) {
+    color: #4e4e4e;
 }
