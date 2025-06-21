@@ -28,55 +28,60 @@
                     </div>
                 </div>
                 <div class="col-12 col-lg-4 position-sticky h-100" style="top: 80px;">
-                    <div class="p-10 mb-8" style="background-color: #F2F4F7; border-radius: 32px">
+                    <div class="p-10 mb-3" style="background-color: #F2F4F7; border-radius: 32px">
                         <h2 class="text-dark" id="how-it-works" data-kt-scroll-offset="{default: 100, lg: 150}">
                             {{ $data->judul_product }}</h2>
                         <div class="fs-lg-6">
                             {!! $data->deskripsi !!}
                         </div>
-                        <div class="d-grid">
+                        <div class="d-grid gap-2">
+                            @if ($data->has_discount)
+                                <div class="d-flex flex-row align-items-center gap-2">
+                                    <span class="text-muted text-decoration-line-through mb-1"
+                                        style="font-size: 14px; font-style: italic">
+                                        ${{ number_format($data->original_price, 2, '.', '') }}
+                                    </span>
+                                    <span class="badge text-primary py-3 rounded-pill fw-bolder"
+                                        style="font-size: 1.2rem; padding: 0%">
+                                        ${{ number_format($data->final_price, 2, '.', '') }}
+                                    </span>
+                                </div>
+                            @endif
                             <a href="{{ $data->link }}" target="_blank" class="btn btn-primary rounded-pill fw-bolder"
                                 style="border: 2px solid transparent; transition: all 0.3s ease;"
                                 onmouseover="this.style.color='#794FFC'; this.style.borderColor='#794FFC'; this.style.backgroundColor='white';"
                                 onmouseout="this.style.color='white'; this.style.borderColor='transparent'; this.style.backgroundColor='#794FFC';">
-                                {{ $data->price == 0 ? 'Get Free' : $data->price . ' Buy Now' }}
+                                @if ($data->original_price == 0)
+                                    Get Free
+                                @else
+                                    <span class="ms-2">${{ number_format($data->original_price, 2, '.', '') }}</span> Buy
+                                    Now
+                                @endif
                             </a>
-                            {{-- <a href="{{ $data->link }}" target="_blank"
-                                class="btn rounded-pill text-dark fw-bolder">Preview
-                                in browser <i class="bi bi-arrow-right-short fw-bold fs-1"></i></a> --}}
                         </div>
                     </div>
-
-                    {{-- <div class="p-10 mb-8" style="background-color: #F2F4F7; border-radius: 32px">
-                        <h2 class="text-dark" id="how-it-works" data-kt-scroll-offset="{default: 100, lg: 150}">
-                            Information</h2>
-                        <ul class="list-group">
-                            <li class="list-group-item py-2 px-0 d-flex align-items-center justify-content-between"
-                                style="background-color: transparent; color: #000000; opacity: 0.6;">
-                                <span>Compatibility</span> <span>Framer, Figma</span>
-                            </li>
-                            <li class="list-group-item py-2 px-0 d-flex align-items-center justify-content-between"
-                                style="background-color: transparent; color: #000000; opacity: 0.6;">
-                                <span>File size</span> <span>56.74 MB</span>
-                            </li>
-                            <li class="list-group-item py-2 px-0 d-flex align-items-center justify-content-between"
-                                style="background-color: transparent; color: #000000; opacity: 0.6;">
-                                <span>Last update</span> <span>11 Nov 2088</span>
-                            </li>
-                        </ul>
-                    </div> --}}
-
-                    {{-- <div class="p-10 mb-8" style="background-color: #111111; border-radius: 32px">
-                        <h1 class="text-white fs-2qx" id="how-it-works" data-kt-scroll-offset="{default: 100, lg: 150}">
-                            Pro Access</h1>
-                        <div class="fs-lg-6 text-white mb-3">
-                            Designing in Framer has never been so fast and effortless. Browse hundreds of beautifully
-                            designed layouts, copy and paste assets.
+                    <div class="p-10 mb-8" style="background-color: #F2F4F7; border-radius: 32px">
+                        <div class="fs-lg-6 fw-bold mb-4">
+                            Download All These Bundles for <span class="text-primary">Free Now!</span>
                         </div>
-                        <div class="d-grid">
-                            <a href="" class="btn btn-primary rounded-pill text-white fw-bolder">Subscribe</a>
+                        <div class="d-flex flex-wrap">
+                            @if (isset($free_products) && $free_products->count() > 0)
+                                @foreach ($free_products as $free)
+                                    <a href="{{ route('detail-product', ['params' => $free->slug]) }}"
+                                        class="text-decoration-none w-50 px-2 mb-3">
+                                        <div style="border-radius: 12px; overflow: hidden; width: 100%; height: 120px;">
+                                            <img src="{{ asset('public/product-thumbnail/' . $free->thumbnail) }}"
+                                                alt="{{ $free->judul_product }}" class="w-100 h-100 object-fit-cover"
+                                                style="border: 1px solid #eee">
+                                        </div>
+                                    </a>
+                                @endforeach
+                            @else
+                                <div class="text-muted w-100 text-center py-3">No free products available at the moment.
+                                </div>
+                            @endif
                         </div>
-                    </div> --}}
+                    </div>
                 </div>
             </div>
         </div>
