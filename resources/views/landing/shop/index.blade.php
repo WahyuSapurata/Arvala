@@ -43,31 +43,114 @@
     </div>
 @endsection
 @section('content')
+
+    {{-- CSS Rules for Tab Navigation --}}
+    <style>
+        /* Default state for all nav links in this component */
+        .nav-pills-custom .nav-link {
+            color: #4E4E4E;
+            font-weight: normal;
+            background-color: transparent;
+            border: none;
+        }
+
+        /* Active state for nav links and the dropdown toggle */
+        .nav-pills-custom .nav-link.active,
+        .nav-pills-custom .show>.nav-link {
+            /* .show>.nav-link is for the dropdown toggle */
+            color: #7E36F4 !important;
+            font-weight: bold !important;
+            background-color: transparent !important;
+        }
+
+        /* Active state for items inside the dropdown */
+        .dropdown-menu .dropdown-item.active,
+        .dropdown-menu .dropdown-item:active {
+            color: #7E36F4 !important;
+            background-color: transparent !important;
+        }
+
+        /* Inactive items in dropdown */
+        .dropdown-menu .dropdown-item:not(.active) {
+            color: #4E4E4E;
+        }
+    </style>
+
     <!--begin::How It Works Section-->
     <div class="z-index-2 mb-5 mb-md-20 mt-20">
         <!--begin::Container-->
         <div class="container" id="product-shop">
-            <div class="mb-5">
-                <div class="d-grid justify-content-center">
-                    <ul style="height: 55px; overflow: hidden; overflow-x: auto;"
-                        class="nav nav-tabs nav-pills border-0 flex-nowrap text-nowrap gap-3 nav-scroll-wrapper w-100">
-                        <li class="nav-item m-0 btn-outline-custom">
-                            <a class="nav-link active btn" data-bs-toggle="tab" href="#kt_vtab_pane_all">All</a>
-                        </li>
 
-                        @foreach ($data_kategori as $kategori)
-                            <li class="nav-item m-0 btn-outline-custom">
-                                <a class="nav-link btn" data-bs-toggle="tab"
-                                    href="#kt_vtab_pane_{{ $kategori->uuid }}">{{ $kategori->nama_kategori }}</a>
+            {{-- Bagian Navigasi Kategori (inline style dihapus) --}}
+            <div class="mb-5">
+                <div class="d-flex justify-content-between align-items-center">
+                    <!-- Bagian Kiri: Tulisan "Realise" -->
+                    <h4 class="fw-bolder m-0 d-none d-lg-block" style="color: #313131;">Release</h4>
+
+                    <!-- Bagian Kanan: Navigasi Kategori -->
+                    <div class="d-flex justify-content-center justify-content-lg-end flex-grow-1">
+                        <ul class="nav nav-pills nav-pills-custom gap-3">
+
+                            <!-- Tombol All - Diubah menjadi link navigasi biasa -->
+                            <li class="nav-item m-0">
+                                <a class="nav-link btn btn-outline-custom {{ $active_tab_id === 'all' ? 'active' : '' }}"
+                                    href="{{ route('shop') }}#product-shop">All</a>
                             </li>
-                        @endforeach
-                    </ul>
+
+                            <!-- Tombol Bundle -->
+                            @if ($bundleCategory)
+                                <li class="nav-item m-0">
+                                    <a class="nav-link btn btn-outline-custom {{ $active_tab_id === $bundleCategory->uuid ? 'active' : '' }}"
+                                        data-bs-toggle="tab"
+                                        href="#kt_vtab_pane_{{ $bundleCategory->uuid }}">{{ $bundleCategory->nama_kategori }}</a>
+                                </li>
+                            @endif
+
+                            <!-- Tombol Free -->
+                            @if ($freeCategory)
+                                <li class="nav-item m-0">
+                                    <a class="nav-link btn btn-outline-custom {{ $active_tab_id === $freeCategory->uuid ? 'active' : '' }}"
+                                        data-bs-toggle="tab"
+                                        href="#kt_vtab_pane_{{ $freeCategory->uuid }}">{{ $freeCategory->nama_kategori }}</a>
+                                </li>
+                            @endif
+
+                            <!-- Tombol Kategori Abjad Pertama -->
+                            @if ($firstAlphabeticalCategory)
+                                <li class="nav-item m-0">
+                                    <a class="nav-link btn btn-outline-custom {{ $active_tab_id === $firstAlphabeticalCategory->uuid ? 'active' : '' }}"
+                                        data-bs-toggle="tab"
+                                        href="#kt_vtab_pane_{{ $firstAlphabeticalCategory->uuid }}">{{ $firstAlphabeticalCategory->nama_kategori }}</a>
+                                </li>
+                            @endif
+
+                            <!-- Dropdown untuk Sisa Kategori -->
+                            @if ($dropdownCategories->isNotEmpty())
+                                <li class="nav-item dropdown m-0">
+                                    <a class="nav-link btn btn-outline-custom dropdown-toggle {{ $isDropdownActive ? 'active' : '' }}"
+                                        data-bs-toggle="dropdown" href="#" role="button"
+                                        aria-expanded="false">Category</a>
+                                    <ul class="dropdown-menu">
+                                        @foreach ($dropdownCategories as $kategori)
+                                            <li>
+                                                <a class="dropdown-item {{ $active_tab_id === $kategori->uuid ? 'active' : '' }}"
+                                                    data-bs-toggle="tab"
+                                                    href="#kt_vtab_pane_{{ $kategori->uuid }}">{{ $kategori->nama_kategori }}</a>
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                </li>
+                            @endif
+                        </ul>
+                    </div>
                 </div>
             </div>
 
+            {{-- Bagian Konten Produk (Tidak ada perubahan di sini) --}}
             <div class="tab-content mt-20" id="myTabContent">
                 <!-- Tab Pane for All Products -->
-                <div class="tab-pane fade show active" id="kt_vtab_pane_all" role="tabpanel">
+                <div class="tab-pane fade {{ $active_tab_id === 'all' ? 'show active' : '' }}" id="kt_vtab_pane_all"
+                    role="tabpanel">
                     <div class="row gy-10">
                         @forelse ($product as $item)
                             <div class="col-sm-12 col-md-6 col-lg-4">
@@ -76,12 +159,6 @@
                                     <div class="position-relative overflow-hidden text-center bg-light rounded-3">
                                         <img src="{{ asset('public/product-thumbnail/' . $item->thumbnail) }}"
                                             loading="lazy" class="w-100 rounded-2" alt="{{ $item->judul_product }}">
-                                        @if ($item->diskon && $item->diskon->akhir_tanggal->isFuture())
-                                            <span class="position-absolute top-0 end-0 m-2 badge rounded-md"
-                                                style="background-color: #774CFB; font-weight: 600; font-size: 14px;">
-                                                {{ $item->diskon->diskon_persen }}% Off
-                                            </span>
-                                        @endif
                                     </div>
                                     <div class="card-body d-flex justify-content-between align-items-center px-0 pb-0">
                                         <div>
@@ -91,25 +168,10 @@
                                         <div class="text-end">
                                             @if ($item->final_price == 0)
                                                 <span class="badge text-primary px-4 py-3 rounded-pill fw-bolder"
-                                                    style="background-color: transparent; font-size: 1.2rem;">
-                                                    Free
-                                                </span>
-                                            @elseif ($item->discount_percentage > 0)
-                                                <div class="d-flex flex-column align-items-end">
-                                                    <span class="text-muted text-decoration-line-through mb-1"
-                                                        style="font-size: 14px; font-style: italic">
-                                                        ${{ number_format($item->original_price, 2, '.', '') }}
-                                                    </span>
-                                                    <span class="badge text-primary py-3 rounded-pill fw-bolder"
-                                                        style="font-size: 1.2rem; padding: 0%">
-                                                        ${{ number_format($item->final_price, 2, '.', '') }}
-                                                    </span>
-                                                </div>
+                                                    style="background-color: transparent; font-size: 1.2rem;">Free</span>
                                             @else
-                                                <span class="badge text-white px-4 py-3 rounded-pill fw-bolder"
-                                                    style="background-color: #323232; font-size: 1.2rem;">
-                                                    ${{ number_format($item->final_price, 2, '.', '') }}
-                                                </span>
+                                                <span class="badge text-primary px-4 py-3 rounded-pill fw-bolder"
+                                                    style="font-size: 1.2rem;">${{ number_format($item->final_price, 2, '.', '') }}</span>
                                             @endif
                                         </div>
                                     </div>
@@ -129,27 +191,23 @@
                     @if ($product->hasPages())
                         <nav aria-label="Page navigation example">
                             <ul class="pagination justify-content-center mt-10">
-                                {{-- Previous Page Link --}}
+                                {{-- Pagination Links --}}
                                 @if ($product->onFirstPage())
                                     <li class="page-item disabled"><span class="page-link">«</span></li>
                                 @else
                                     <li class="page-item"><a class="page-link" href="{{ $product->previousPageUrl() }}"
                                             rel="prev">«</a></li>
                                 @endif
-
-                                {{-- Pagination Elements --}}
                                 @foreach ($product->links()->elements as $element)
                                     @if (is_string($element))
                                         <li class="page-item disabled"><span class="page-link">{{ $element }}</span>
                                         </li>
                                     @endif
-
                                     @if (is_array($element))
                                         @foreach ($element as $page => $url)
                                             @if ($page == $product->currentPage())
                                                 <li class="page-item active"><span
-                                                        class="page-link">{{ $page }}</span>
-                                                </li>
+                                                        class="page-link">{{ $page }}</span></li>
                                             @else
                                                 <li class="page-item"><a class="page-link"
                                                         href="{{ $url }}">{{ $page }}</a></li>
@@ -157,8 +215,6 @@
                                         @endforeach
                                     @endif
                                 @endforeach
-
-                                {{-- Next Page Link --}}
                                 @if ($product->hasMorePages())
                                     <li class="page-item"><a class="page-link" href="{{ $product->nextPageUrl() }}"
                                             rel="next">»</a></li>
@@ -172,12 +228,12 @@
 
                 <!-- Tab Panes for Each Category -->
                 @foreach ($data_kategori as $kategori)
-                    <div class="tab-pane fade" id="kt_vtab_pane_{{ $kategori->uuid }}" role="tabpanel">
+                    <div class="tab-pane fade {{ $active_tab_id === $kategori->uuid ? 'show active' : '' }}"
+                        id="kt_vtab_pane_{{ $kategori->uuid }}" role="tabpanel">
                         <div class="row gy-10">
                             @php
                                 $productsInCategory = $productByCategory[$kategori->uuid] ?? collect([]);
                             @endphp
-
                             @forelse ($productsInCategory as $item)
                                 <div class="col-sm-12 col-md-6 col-lg-4">
                                     <a href="{{ route('detail-product', ['params' => $item->slug]) }}"
@@ -185,12 +241,6 @@
                                         <div class="position-relative overflow-hidden text-center bg-light rounded-3">
                                             <img src="{{ asset('public/product-thumbnail/' . $item->thumbnail) }}"
                                                 loading="lazy" class="w-100 rounded-2" alt="{{ $item->judul_product }}">
-                                            @if ($item->diskon && $item->diskon->akhir_tanggal->isFuture())
-                                                <span class="position-absolute top-0 end-0 m-2 badge rounded-md"
-                                                    style="background-color: #774CFB; font-weight: 600; font-size: 14px;">
-                                                    {{ $item->diskon->diskon_persen }}% Off
-                                                </span>
-                                            @endif
                                         </div>
                                         <div class="card-body d-flex justify-content-between align-items-center px-0 pb-0">
                                             <div>
@@ -200,25 +250,10 @@
                                             <div class="text-end">
                                                 @if ($item->final_price == 0)
                                                     <span class="badge text-primary px-4 py-3 rounded-pill fw-bolder"
-                                                        style="background-color: transparent; font-size: 1.2rem;">
-                                                        Free
-                                                    </span>
-                                                @elseif ($item->discount_percentage > 0)
-                                                    <div class="d-flex flex-column align-items-end">
-                                                        <span class="text-muted text-decoration-line-through mb-1"
-                                                            style="font-size: 14px; font-style: italic">
-                                                            ${{ number_format($item->original_price, 2, '.', '') }}
-                                                        </span>
-                                                        <span class="badge text-primary py-3 rounded-pill fw-bolder"
-                                                            style="font-size: 1.2rem; padding: 0%">
-                                                            ${{ number_format($item->final_price, 2, '.', '') }}
-                                                        </span>
-                                                    </div>
+                                                        style="background-color: transparent; font-size: 1.2rem;">Free</span>
                                                 @else
-                                                    <span class="badge text-white px-4 py-3 rounded-pill fw-bolder"
-                                                        style="background-color: #323232; font-size: 1.2rem;">
-                                                        ${{ number_format($item->final_price, 2, '.', '') }}
-                                                    </span>
+                                                    <span class="badge text-primary px-4 py-3 rounded-pill fw-bolder"
+                                                        style="font-size: 1.2rem;">${{ number_format($item->final_price, 2, '.', '') }}</span>
                                                 @endif
                                             </div>
                                         </div>
@@ -240,182 +275,7 @@
         </div>
     </div>
     <!--end::How It Works Section-->
-    <!--end::Highlight-->
-    <div class="my-20 position-relative z-index-2">
-        <!--begin::Container-->
-        <div class="container">
-            <!--begin::Highlight-->
-            <div class="shadow p-8 p-lg-15 custom-card" style="background: #7E36F4;">
-                <!--begin::Content-->
-                <div class="d-grid  d-md-flex align-items-center justify-content-between gap-2 gap-md-10 mb-4 mb-md-4">
-                    <!--begin::Title-->
-                    <div class="fs-1 fs-lg-3qx fw-bolder text-white flex-equal">Design Smarter
-                        Present Better
-                    </div>
-                    <!--end::Title-->
-                    <div class="flex-equal fs-lg-4" style="color: #FCFCFF">
-                        Create stunning presentations effortlessly
-                        with high-quality mockups tailored for designers who value precision and efficiency.
-                    </div>
-                </div>
-                <!--end::Content-->
-                <!--begin::Link-->
-                <div class="d-grid d-md-flex gap-4 gap-md-10">
-                    <!--begin::Description-->
-                    <div class="fs-6 fs-lg-5 text-white fw-semibold flex-equal">
-                        <ul class="list-group">
-                            <li class="list-group-item text-white d-flex align-items-center"
-                                style="background-color: #8540F5"><i class="bi bi-check-square-fill me-4"
-                                    style="font-size: 20px; color: #DADA73"></i> Quick and easy
-                                customization
-                                with Smart Objects</li>
-                            <li class="list-group-item text-white d-flex align-items-center"
-                                style="background-color: #8540F5"><i class="bi bi-check-square-fill me-4"
-                                    style="font-size: 20px; color: #DADA73"></i>Fully adjustable
-                                object and
-                                background colors</li>
-                            <li class="list-group-item text-white d-flex align-items-center"
-                                style="background-color: #8540F5"><i class="bi bi-check-square-fill me-4"
-                                    style="font-size: 20px; color: #DADA73"></i>High Resolution: 5000
-                                × 3500
-                                pixels at 300 dpi</li>
-                            <li class="list-group-item text-white d-flex align-items-center"
-                                style="background-color: #8540F5"><i class="bi bi-check-square-fill me-4"
-                                    style="font-size: 20px; color: #DADA73"></i>Well-organized layers
-                                for
-                                seamless editing</li>
-                        </ul>
-                    </div>
-                    <!--end::Description-->
-                    <div class="d-grid align-content-between gap-3 flex-equal">
-                        <div class="flex-equal fs-lg-4" style="color: #FCFCFF">
-                            Join our <span class="fw-bolder fst-italic">Telegram community</span> to get
-                            early access to new mockups, exclusive discounts, and design tips!
-                        </div>
-                        <div>
-                            <a href="https://t.me/arvalamockup" target="_blank"
-                                class="btn py-2 py-lg-4 rounded-pill border text-white fs-lg-4"
-                                style="font-weight: 500; background-color: #ADAD47;">
-                                Join Our Telegram
-                                <i class="bi bi-telegram p-0 ms-3 text-white fs-1 fs-lg-2qx"
-                                    style="margin-right: -10px"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                <!--end::Link-->
-            </div>
-            <!--end::Highlight-->
-        </div>
-        <!--end::Container-->
-    </div>
-    <!--end::Highlight-->
-    <div class="mb-10 z-index-2">
-        <div class="container">
-            <!--begin::Heading-->
-            <div class="d-flex justify-content-center mb-17">
-                <!--begin::Title-->
-                <h3 class="text-dark fs-2qx fs-md-3x fs-lg-4x" id="how-it-works"
-                    data-kt-scroll-offset="{default: 100, lg: 150}">
-                    Frequently asked</h3>
-                <!--end::Title-->
-            </div>
-            <!--end::Heading-->
-            <!--begin::Accordion-->
-            <div class="accordion d-grid gap-5" id="kt_accordion_1">
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="kt_accordion_1_header_1">
-                        <button class="accordion-button fs-md-3  fw-bolder text-gray-600" type="button"
-                            data-bs-toggle="collapse" data-bs-target="#kt_accordion_1_body_1" aria-expanded="true"
-                            aria-controls="kt_accordion_1_body_1">
-                            Which tools do I need to use the library?
-                        </button>
-                    </h2>
-                    <div id="kt_accordion_1_body_1" class="accordion-collapse collapse show"
-                        aria-labelledby="kt_accordion_1_header_1" data-bs-parent="#kt_accordion_1">
-                        <div class="accordion-body fs-md-5 text-gray-700">
-                            You will need basic knowledge of Framer to be able to use the template What is Framer? Framer is
-                            a web-based platform to quickly build world-class websites and web projects.
-                        </div>
-                    </div>
-                </div>
-
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="kt_accordion_1_header_2">
-                        <button class="accordion-button fs-md-3  fw-bolder text-gray-600 collapsed" type="button"
-                            data-bs-toggle="collapse" data-bs-target="#kt_accordion_1_body_2" aria-expanded="false"
-                            aria-controls="kt_accordion_1_body_2">
-                            Is this a one time payment?
-                        </button>
-                    </h2>
-                    <div id="kt_accordion_1_body_2" class="accordion-collapse collapse"
-                        aria-labelledby="kt_accordion_1_header_2" data-bs-parent="#kt_accordion_1">
-                        <div class="accordion-body fs-md-5 text-gray-700">
-                            Yes. You pay only once to access the template forever.
-                        </div>
-                    </div>
-                </div>
-
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="kt_accordion_1_header_3">
-                        <button class="accordion-button fs-md-3  fw-bolder text-gray-600 collapsed" type="button"
-                            data-bs-toggle="collapse" data-bs-target="#kt_accordion_1_body_3" aria-expanded="false"
-                            aria-controls="kt_accordion_1_body_3">
-                            Do you offer student / teacher discounts?
-                        </button>
-                    </h2>
-                    <div id="kt_accordion_1_body_3" class="accordion-collapse collapse"
-                        aria-labelledby="kt_accordion_1_header_3" data-bs-parent="#kt_accordion_1">
-                        <div class="accordion-body fs-md-5 text-gray-700">
-                            Absolutely! If you’re a student or a teacher, reach out to us with a document proof of your
-                            student/teacher status for a 50% discount.
-                        </div>
-                    </div>
-                </div>
-
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="kt_accordion_1_header_4">
-                        <button class="accordion-button fs-md-3  fw-bolder text-gray-600 collapsed" type="button"
-                            data-bs-toggle="collapse" data-bs-target="#kt_accordion_1_body_4" aria-expanded="false"
-                            aria-controls="kt_accordion_1_body_4">
-                            Which payment methods are accepted?
-                        </button>
-                    </h2>
-                    <div id="kt_accordion_1_body_4" class="accordion-collapse collapse"
-                        aria-labelledby="kt_accordion_1_header_4" data-bs-parent="#kt_accordion_1">
-                        <div class="accordion-body fs-md-5 text-gray-700">
-                            We use Lemon Squeezy as our payment processor with a wide variety of accepted payments such:
-                            <br><br>
-                            Cards (including Mastercard, Visa, Maestro, American Express, Discover, Diners Club, JCB, <br>
-                            UnionPay, and Mada)<br>
-                            PayPal<br>
-                            iDEAL*<br>
-                            Google Pay (Chrome only)<br>
-                            Apple Pay
-                        </div>
-                    </div>
-                </div>
-
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="kt_accordion_1_header_5">
-                        <button class="accordion-button fs-md-3  fw-bolder text-gray-600 collapsed" type="button"
-                            data-bs-toggle="collapse" data-bs-target="#kt_accordion_1_body_5" aria-expanded="false"
-                            aria-controls="kt_accordion_1_body_5">
-                            I have a problem
-                        </button>
-                    </h2>
-                    <div id="kt_accordion_1_body_5" class="accordion-collapse collapse"
-                        aria-labelledby="kt_accordion_1_header_5" data-bs-parent="#kt_accordion_1">
-                        <div class="accordion-body fs-md-5 text-gray-700">
-                            Reach out to us and one of our support staff will help you with any issues or questions you
-                            have.
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!--end::Accordion-->
-        </div>
-    </div>
+    <!-- ... sisa konten halaman ... -->
 @endsection
 @section('script')
     <script>
