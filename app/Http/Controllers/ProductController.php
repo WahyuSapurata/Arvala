@@ -6,6 +6,7 @@ use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Models\Kategori;
 use App\Models\Product;
+use App\Models\DiskonProduk;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\File;
 
@@ -159,6 +160,9 @@ class ProductController extends BaseController
     {
         try {
             $product = Product::where('uuid', $params)->firstOrFail();
+
+            // Hapus semua diskon terkait produk ini
+            DiskonProduk::where('uuid_produk', $product->uuid)->delete();
 
             // Hapus thumbnail
             $thumbnailPath = public_path('public/product-thumbnail/' . $product->thumbnail);
