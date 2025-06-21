@@ -49,33 +49,6 @@
                         </div>
                         <!--end::Menu item-->
                         <!--begin::Menu item-->
-                        <div class="menu-item">
-                            <!--begin::Menu link-->
-                            <a class="menu-link nav-link py-3 px-4 px-xxl-6 {{ request()->routeIs('home') ? 'active' : '' }}"
-                                href="{{ route('home') }}" data-kt-scroll-toggle="true"
-                                data-kt-drawer-dismiss="true">Home</a>
-                            <!--end::Menu link-->
-                        </div>
-                        <!--end::Menu item-->
-                        <!--begin::Menu item-->
-                        {{-- <div class="menu-item">
-                            <!--begin::Menu link-->
-                            <a class="menu-link nav-link py-3 px-4 px-xxl-6 {{ Request::is('shop') ? 'active' : '' }}"
-                                href="{{ route('shop') }}" data-kt-scroll-toggle="true"
-                                data-kt-drawer-dismiss="true">Shop</a>
-                            <!--end::Menu link-->
-                        </div> --}}
-                        <!--end::Menu item-->
-                        <!--begin::Menu item-->
-                        {{-- <div class="menu-item">
-                            <!--begin::Menu link-->
-                            <a class="menu-link nav-link py-3 px-4 px-xxl-6 {{ Request::is('about') ? 'active' : '' }}"
-                                href="{{ route('about') }}" data-kt-scroll-toggle="true"
-                                data-kt-drawer-dismiss="true">About</a>
-                            <!--end::Menu link-->
-                        </div> --}}
-                        <!--end::Menu item-->
-                        <!--begin::Menu item-->
                         <div class="menu-item" data-kt-menu-trigger="hover" data-kt-menu-placement="bottom-start">
                             <!--begin::Menu link-->
                             <a href="#" class="menu-link py-3">
@@ -137,15 +110,20 @@
                             </script>
 
                         </div>
-                        <!--end::Menu item-->
-                        <!--begin::Menu item-->
-                        {{-- <div class="menu-item">
-                            <!--begin::Menu link-->
-                            <a class="menu-link nav-link py-3 px-4 px-xxl-6 {{ Request::is('faqs') ? 'active' : '' }}"
-                                href="{{ route('faqs') }}" data-kt-scroll-toggle="true"
-                                data-kt-drawer-dismiss="true">FAQs</a>
-                            <!--end::Menu link-->
-                        </div> --}}
+                        <!-- Bundle Mockup Link -->
+                        <div class="menu-item">
+                            <a class="menu-link nav-link py-3 px-4 px-xxl-6 {{ request()->routeIs('shop') && request()->get('nama_kategori') === 'Bundle' ? 'active' : '' }}"
+                                href="{{ route('shop', ['nama_kategori' => 'Bundle']) }}#product-shop">
+                                Bundle Mockup
+                            </a>
+                        </div>
+
+                        <div class="menu-item">
+                            <a class="menu-link nav-link py-3 px-4 px-xxl-6 {{ request()->routeIs('shop') && request()->get('nama_kategori') === 'Free' ? 'active' : '' }}"
+                                href="{{ route('shop', ['nama_kategori' => 'Free']) }}#product-shop">
+                                Free Mockup
+                            </a>
+                        </div>
                         <!--end::Menu item-->
                         <!--begin::Menu item-->
                         <div class="menu-item d-flex d-md-none d-lg-none">
