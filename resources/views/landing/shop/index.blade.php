@@ -194,7 +194,7 @@
                                         @endforeach
                                     @endif
                                 @endforeach
-                                @if ($product->hasitemPages())
+                                @if ($product->hasPages())
                                     <li class="page-item"><a class="page-link" href="{{ $product->nextPageUrl() }}"
                                             rel="next">»</a></li>
                                 @else
