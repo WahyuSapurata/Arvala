@@ -1,7 +1,7 @@
 <!--begin::Footer Section-->
 <div class="mb-0">
     <!--begin::Wrapper-->
-    <div class="py-10 py-lg-20">
+    <div class="py-10 py-lg-20 mt-5" style="background-color: #ebebeb">
         <!--begin::Container-->
         <div class="container">
             <!--begin::Row-->
@@ -65,8 +65,7 @@
         <!--begin::Container-->
         <div class="container">
             <!--begin::Wrapper-->
-            <div class="d-flex justify-content-center flex-column flex-md-row flex-stack py-4 py-lg-6 rounded"
-                style="background-color: #EBEBEB">
+            <div class="d-flex justify-content-center flex-column flex-md-row flex-stack py-4 py-lg-6 rounded">
                 <!--begin::Copyright-->
                 <div class="d-flex align-items-center justify-content-center order-2 order-md-1">
                     <!--begin::Logo image-->

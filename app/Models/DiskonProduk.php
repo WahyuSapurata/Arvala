@@ -5,24 +5,23 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Ramsey\Uuid\Uuid;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Product extends Model
+class DiskonProduk extends Model
 {
     use HasFactory;
 
-    protected $table = 'products';
+    protected $table = 'diskon_produks';
     protected $primaryKey = 'id';
     protected $fillable = [
         'uuid',
-        'uuid_kategori',
-        'judul_product',
-        'slug',
-        'thumbnail',
-        'price',
-        'deskripsi',
-        'image_product',
-        'meta',
-        'link',
+        'uuid_produk',
+        'diskon_persen',
+        'akhir_tanggal'
+    ];
+
+    protected $casts = [
+        'akhir_tanggal' => 'datetime',
     ];
 
     protected static function boot()
@@ -35,14 +34,11 @@ class Product extends Model
         });
     }
 
-    public function kategori()
+    /**
+     * Relasi ke model Product
+     */
+    public function product(): BelongsTo
     {
-        return $this->belongsTo(Kategori::class, 'uuid_kategori', 'uuid');
+        return $this->belongsTo(Product::class, 'uuid_produk', 'uuid');
     }
-
-    public function diskon()
-    {
-        return $this->hasOne(DiskonProduk::class, 'uuid_produk', 'uuid');
-    }
-
 }

@@ -4,15 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Models\Kategori;
 use App\Models\Product;
+use App\Models\DiskonProduk;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class Landing extends BaseController
 {
     public function home()
     {
-        $module = 'Home';
+        // Menambahkan logika penghapusan diskon kedaluwarsa di halaman utama
+        DiskonProduk::where('akhir_tanggal', '<', Carbon::now('Asia/Jakarta'))->delete();
 
-        $all_products = Product::latest()->get();
+        $module = 'Home';
+        $all_products = Product::with('diskon')->latest()->get();
         $kategoriMap = Kategori::all()->keyBy('uuid');
 
         $sanitizePrice = function ($value) {
@@ -23,8 +27,16 @@ class Landing extends BaseController
             $kategori = $kategoriMap->get($product->uuid_kategori);
             $product->kategori = $kategori ? $kategori->nama_kategori : '-';
             $product->original_price = $sanitizePrice($product->price);
-            $product->discount_percentage = 0;
-            $product->final_price = $product->original_price;
+
+            if ($product->diskon && $product->diskon->akhir_tanggal->isFuture()) {
+                $diskon = $sanitizePrice($product->diskon->diskon_persen);
+                $product->discount_percentage = $diskon;
+                $product->final_price = $product->original_price - ($product->original_price * $diskon / 100);
+            } else {
+                $product->discount_percentage = 0;
+                $product->final_price = $product->original_price;
+            }
+
             return $product;
         };
 
@@ -62,12 +74,22 @@ class Landing extends BaseController
 
     public function detail_product($params)
     {
-        $data = Product::where('slug', $params)->firstOrFail();
+        // Menambahkan logika penghapusan diskon kedaluwarsa di halaman detail
+        DiskonProduk::where('akhir_tanggal', '<', Carbon::now('Asia/Jakarta'))->delete();
+
+        $data = Product::with('diskon')->where('slug', $params)->firstOrFail();
         $module = $data->judul_product;
 
         $data->original_price = (float) str_replace(['$', ','], '', $data->price);
-        $data->final_price = $data->original_price;
-        $data->has_discount = false;
+
+        if ($data->diskon && $data->diskon->akhir_tanggal->isFuture()) {
+            $data->discount_percentage = (float) $data->diskon->diskon_persen;
+            $data->final_price = $data->original_price - ($data->original_price * $data->discount_percentage / 100);
+            $data->has_discount = true;
+        } else {
+            $data->final_price = $data->original_price;
+            $data->has_discount = false;
+        }
 
         $free_products = Product::whereHas('kategori', function($query) {
             $query->where('nama_kategori', 'Free');
@@ -80,23 +102,20 @@ class Landing extends BaseController
 
     public function shop(Request $request)
     {
-        $module = 'Shop';
+        // Logika penghapusan sudah ada di sini
+        DiskonProduk::where('akhir_tanggal', '<', Carbon::now('Asia/Jakarta'))->delete();
 
-        // 1. Mengambil dan mengurutkan kategori (Logika ini tetap sama)
+        $module = 'Shop';
         $data_kategori = Kategori::all()->sortBy(function ($kategori) {
             if ($kategori->nama_kategori === 'Bundle') return '1_Bundle';
             if ($kategori->nama_kategori === 'Free') return '2_Free';
             return '3_' . $kategori->nama_kategori;
         });
 
-        // Memecah kategori untuk tampilan navigasi baru (Logika ini tetap sama)
         $bundleCategory = $data_kategori->firstWhere('nama_kategori', 'Bundle');
         $freeCategory = $data_kategori->firstWhere('nama_kategori', 'Free');
-        $otherCategories = $data_kategori->whereNotIn('nama_kategori', ['Bundle', 'Free']);
-        $firstAlphabeticalCategory = $otherCategories->first();
-        $dropdownCategories = $otherCategories->skip(1);
+        $dropdownCategories = $data_kategori->whereNotIn('nama_kategori', ['Bundle', 'Free']);
 
-        // 2. Tentukan tab aktif berdasarkan parameter URL (Logika ini tetap sama)
         $active_tab_id = 'all';
         $categoryNameFromUrl = $request->input('nama_kategori');
         if ($categoryNameFromUrl) {
@@ -106,43 +125,44 @@ class Landing extends BaseController
             }
         }
 
-        // Cek apakah tab aktif ada di dropdown (Logika ini tetap sama)
         $isDropdownActive = $dropdownCategories->contains('uuid', $active_tab_id);
 
-        // === PERUBAHAN UTAMA: MENGHAPUS LOGIKA DISKON DARI QUERY PRODUK ===
-
-        // 3. Mengambil produk untuk tab "All" (paginasi) tanpa memanggil relasi 'diskon'
-        $product = Product::query() // Menggunakan query() untuk memulai, with('diskon') dihapus
+        $product = Product::with('diskon')
             ->when($request->search, fn($q) => $q->where('meta', 'like', '%' . $request->search . '%'))
             ->join('kategoris', 'products.uuid_kategori', '=', 'kategoris.uuid')
             ->select('products.*', 'kategoris.nama_kategori as kategori')
             ->paginate(6);
 
-        // Menyiapkan data harga tanpa kalkulasi diskon
         $product->getCollection()->transform(function ($item) {
-            $original_price = (float) str_replace(['$', ','], '', $item->price);
-            $item->original_price = $original_price;
-            $item->final_price = $original_price; // Harga final sekarang sama dengan harga asli
-            $item->discount_percentage = 0; // Set diskon ke 0
+            $item->original_price = (float) str_replace(['$', ','], '', $item->price);
+
+            if ($item->diskon && $item->diskon->akhir_tanggal->isFuture()) {
+                $item->discount_percentage = (float) $item->diskon->diskon_persen;
+                $item->final_price = $item->original_price - ($item->original_price * $item->discount_percentage / 100);
+            } else {
+                $item->final_price = $item->original_price;
+                $item->discount_percentage = 0;
+            }
             return $item;
         });
 
-        // Mengambil semua produk dan mengelompokkannya berdasarkan kategori, tanpa relasi 'diskon'
-        $productByCategory = Product::query() // with('diskon') dihapus
+        $productByCategory = Product::with('diskon')
             ->join('kategoris', 'products.uuid_kategori', '=', 'kategoris.uuid')
             ->select('products.*', 'kategoris.nama_kategori')
             ->get()
             ->map(function ($item) {
-                // Menyiapkan data harga tanpa kalkulasi diskon
-                $original_price = (float) str_replace(['$', ','], '', $item->price);
-                $item->original_price = $original_price;
-                $item->final_price = $original_price; // Harga final sekarang sama dengan harga asli
-                $item->discount_percentage = 0; // Set diskon ke 0
+                $item->original_price = (float) str_replace(['$', ','], '', $item->price);
+                if ($item->diskon && $item->diskon->akhir_tanggal->isFuture()) {
+                    $item->discount_percentage = (float) $item->diskon->diskon_persen;
+                    $item->final_price = $item->original_price - ($item->original_price * $item->discount_percentage / 100);
+                } else {
+                    $item->final_price = $item->original_price;
+                    $item->discount_percentage = 0;
+                }
                 return $item;
             })
             ->groupBy('uuid_kategori');
 
-        // 4. Kirim semua variabel ke view (Logika ini tetap sama)
         return view('landing.shop.index', compact(
             'module',
             'data_kategori',
@@ -151,7 +171,6 @@ class Landing extends BaseController
             'active_tab_id',
             'bundleCategory',
             'freeCategory',
-            'firstAlphabeticalCategory',
             'dropdownCategories',
             'isDropdownActive'
         ));

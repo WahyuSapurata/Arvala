@@ -54,15 +54,40 @@
                                 @if ($data->original_price == 0)
                                     Get Free
                                 @else
-                                    <span class="ms-2">${{ number_format($data->original_price, 2, '.', '') }}</span> Buy
-                                    Now
+                                    Buy Now
                                 @endif
                             </a>
+
+
+
                         </div>
                     </div>
                     <div class="p-10 mb-8" style="background-color: #F2F4F7; border-radius: 32px">
                         <div class="fs-lg-6 fw-bold mb-4">
                             Download All These Bundles for <span class="text-primary">Free Now!</span>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                         </div>
                         <div class="d-flex flex-wrap">
                             @if (isset($free_products) && $free_products->count() > 0)

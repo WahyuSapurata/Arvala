@@ -43,39 +43,6 @@
     </div>
 @endsection
 @section('content')
-
-    {{-- CSS Rules for Tab Navigation --}}
-    <style>
-        /* Default state for all nav links in this component */
-        .nav-pills-custom .nav-link {
-            color: #4E4E4E;
-            font-weight: normal;
-            background-color: transparent;
-            border: none;
-        }
-
-        /* Active state for nav links and the dropdown toggle */
-        .nav-pills-custom .nav-link.active,
-        .nav-pills-custom .show>.nav-link {
-            /* .show>.nav-link is for the dropdown toggle */
-            color: #7E36F4 !important;
-            font-weight: bold !important;
-            background-color: transparent !important;
-        }
-
-        /* Active state for items inside the dropdown */
-        .dropdown-menu .dropdown-item.active,
-        .dropdown-menu .dropdown-item:active {
-            color: #7E36F4 !important;
-            background-color: transparent !important;
-        }
-
-        /* Inactive items in dropdown */
-        .dropdown-menu .dropdown-item:not(.active) {
-            color: #4E4E4E;
-        }
-    </style>
-
     <!--begin::How It Works Section-->
     <div class="z-index-2 mb-5 mb-md-20 mt-20">
         <!--begin::Container-->
@@ -94,7 +61,7 @@
                             <!-- Tombol All - Diubah menjadi link navigasi biasa -->
                             <li class="nav-item m-0">
                                 <a class="nav-link btn btn-outline-custom {{ $active_tab_id === 'all' ? 'active' : '' }}"
-                                    href="{{ route('shop') }}#product-shop">All</a>
+                                    data-bs-toggle="tab" href="#kt_vtab_pane_all">All</a>
                             </li>
 
                             <!-- Tombol Bundle -->
@@ -112,15 +79,6 @@
                                     <a class="nav-link btn btn-outline-custom {{ $active_tab_id === $freeCategory->uuid ? 'active' : '' }}"
                                         data-bs-toggle="tab"
                                         href="#kt_vtab_pane_{{ $freeCategory->uuid }}">{{ $freeCategory->nama_kategori }}</a>
-                                </li>
-                            @endif
-
-                            <!-- Tombol Kategori Abjad Pertama -->
-                            @if ($firstAlphabeticalCategory)
-                                <li class="nav-item m-0">
-                                    <a class="nav-link btn btn-outline-custom {{ $active_tab_id === $firstAlphabeticalCategory->uuid ? 'active' : '' }}"
-                                        data-bs-toggle="tab"
-                                        href="#kt_vtab_pane_{{ $firstAlphabeticalCategory->uuid }}">{{ $firstAlphabeticalCategory->nama_kategori }}</a>
                                 </li>
                             @endif
 
@@ -159,6 +117,12 @@
                                     <div class="position-relative overflow-hidden text-center bg-light rounded-3">
                                         <img src="{{ asset('public/product-thumbnail/' . $item->thumbnail) }}"
                                             loading="lazy" class="w-100 rounded-2" alt="{{ $item->judul_product }}">
+                                        @if ($item->diskon && $item->diskon->akhir_tanggal->isFuture())
+                                            <span class="position-absolute top-0 end-0 m-2 badge rounded-md"
+                                                style="background-color: #774CFB; font-weight: 600; font-size: 14px;">
+                                                {{ $item->diskon->diskon_persen }}% Off
+                                            </span>
+                                        @endif
                                     </div>
                                     <div class="card-body d-flex justify-content-between align-items-center px-0 pb-0">
                                         <div>
@@ -168,10 +132,25 @@
                                         <div class="text-end">
                                             @if ($item->final_price == 0)
                                                 <span class="badge text-primary px-4 py-3 rounded-pill fw-bolder"
-                                                    style="background-color: transparent; font-size: 1.2rem;">Free</span>
+                                                    style="background-color: transparent; font-size: 1.2rem;">
+                                                    Free
+                                                </span>
+                                            @elseif ($item->discount_percentage > 0)
+                                                <div class="d-flex flex-column align-items-end">
+                                                    <span class="text-muted text-decoration-line-through mb-1"
+                                                        style="font-size: 14px; font-style: italic">
+                                                        ${{ number_format($item->original_price, 2, '.', '') }}
+                                                    </span>
+                                                    <span class="badge text-primary py-3 rounded-pill fw-bolder"
+                                                        style="font-size: 1.2rem; padding: 0%">
+                                                        ${{ number_format($item->final_price, 2, '.', '') }}
+                                                    </span>
+                                                </div>
                                             @else
                                                 <span class="badge text-primary px-4 py-3 rounded-pill fw-bolder"
-                                                    style="font-size: 1.2rem;">${{ number_format($item->final_price, 2, '.', '') }}</span>
+                                                    style="font-size: 1.2rem;">
+                                                    ${{ number_format($item->final_price, 2, '.', '') }}
+                                                </span>
                                             @endif
                                         </div>
                                     </div>
@@ -215,7 +194,7 @@
                                         @endforeach
                                     @endif
                                 @endforeach
-                                @if ($product->hasMorePages())
+                                @if ($product->hasitemPages())
                                     <li class="page-item"><a class="page-link" href="{{ $product->nextPageUrl() }}"
                                             rel="next">»</a></li>
                                 @else
@@ -241,6 +220,12 @@
                                         <div class="position-relative overflow-hidden text-center bg-light rounded-3">
                                             <img src="{{ asset('public/product-thumbnail/' . $item->thumbnail) }}"
                                                 loading="lazy" class="w-100 rounded-2" alt="{{ $item->judul_product }}">
+                                            @if ($item->diskon && $item->diskon->akhir_tanggal->isFuture())
+                                                <span class="position-absolute top-0 end-0 m-2 badge rounded-md"
+                                                    style="background-color: #774CFB; font-weight: 600; font-size: 14px;">
+                                                    {{ $item->diskon->diskon_persen }}% Off
+                                                </span>
+                                            @endif
                                         </div>
                                         <div class="card-body d-flex justify-content-between align-items-center px-0 pb-0">
                                             <div>
@@ -250,10 +235,25 @@
                                             <div class="text-end">
                                                 @if ($item->final_price == 0)
                                                     <span class="badge text-primary px-4 py-3 rounded-pill fw-bolder"
-                                                        style="background-color: transparent; font-size: 1.2rem;">Free</span>
+                                                        style="background-color: transparent; font-size: 1.2rem;">
+                                                        Free
+                                                    </span>
+                                                @elseif ($item->discount_percentage > 0)
+                                                    <div class="d-flex flex-column align-items-end">
+                                                        <span class="text-muted text-decoration-line-through mb-1"
+                                                            style="font-size: 14px; font-style: italic">
+                                                            ${{ number_format($item->original_price, 2, '.', '') }}
+                                                        </span>
+                                                        <span class="badge text-primary py-3 rounded-pill fw-bolder"
+                                                            style="font-size: 1.2rem; padding: 0%">
+                                                            ${{ number_format($item->final_price, 2, '.', '') }}
+                                                        </span>
+                                                    </div>
                                                 @else
                                                     <span class="badge text-primary px-4 py-3 rounded-pill fw-bolder"
-                                                        style="font-size: 1.2rem;">${{ number_format($item->final_price, 2, '.', '') }}</span>
+                                                        style="font-size: 1.2rem;">
+                                                        ${{ number_format($item->final_price, 2, '.', '') }}
+                                                    </span>
                                                 @endif
                                             </div>
                                         </div>

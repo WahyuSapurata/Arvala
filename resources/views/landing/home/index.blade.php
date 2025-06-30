@@ -278,8 +278,10 @@
 
                 @forelse ($more_product as $more)
                     <div class="col-sm-12 col-md-6 col-lg-4">
+
                         <a href="{{ route('detail-product', ['params' => $more->slug]) }}"
                             class="card card-product border-0">
+
                             <div class="position-relative overflow-hidden text-center bg-light rounded-3">
                                 <img src="{{ asset('public/product-thumbnail/' . $more->thumbnail) }}" loading="lazy"
                                     class="w-100 rounded-2" alt="{{ $more->judul_product }}">
@@ -290,6 +292,8 @@
                                     </span>
                                 @endif
                             </div>
+
+
 
                             <div class="card-body d-flex justify-content-between align-items-center px-0 pb-0">
                                 <div>
@@ -322,8 +326,11 @@
                                     @endif
                                 </div>
                             </div>
+
                         </a>
+
                     </div>
+
                 @empty
                     <div class="card text-center shadow-sm">
                         <div class="card-body">
@@ -333,6 +340,7 @@
                         </div>
                     </div>
                 @endforelse
+
             </div>
             <!--end::Row-->
         </div>
