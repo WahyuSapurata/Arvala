@@ -57,56 +57,33 @@
                                     Buy Now
                                 @endif
                             </a>
-
-
-
                         </div>
                     </div>
-                    <div class="p-10 mb-8" style="background-color: #F2F4F7; border-radius: 32px">
-                        <div class="fs-lg-6 fw-bold mb-4">
-                            Download All These Bundles for <span class="text-primary">Free Now!</span>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+                    @if (strtolower($data->kategori->nama_kategori ?? '') === 'bundle')
+                        <div class="p-10 mb-8" style="background-color: #F2F4F7; border-radius: 32px">
+                            <div class="fs-lg-6 fw-bold mb-4">
+                                Download All These Bundles for <span class="text-primary">Free Now!</span>
+                            </div>
+                            <div class="d-flex flex-wrap">
+                                @if (isset($free_products) && $free_products->count() > 0)
+                                    @foreach ($free_products as $free)
+                                        <a href="{{ route('detail-product', ['params' => $free->slug]) }}"
+                                            class="text-decoration-none w-50 px-2 mb-3">
+                                            <div style="border-radius: 12px; overflow: hidden; width: 100%; height: 120px;">
+                                                <img src="{{ asset('public/product-thumbnail/' . $free->thumbnail) }}"
+                                                    alt="{{ $free->judul_product }}" class="w-100 h-100 object-fit-cover"
+                                                    style="border: 1px solid #eee">
+                                            </div>
+                                        </a>
+                                    @endforeach
+                                @else
+                                    <div class="text-muted w-100 text-center py-3">No free products available at the moment.
+                                    </div>
+                                @endif
+                            </div>
                         </div>
-                        <div class="d-flex flex-wrap">
-                            @if (isset($free_products) && $free_products->count() > 0)
-                                @foreach ($free_products as $free)
-                                    <a href="{{ route('detail-product', ['params' => $free->slug]) }}"
-                                        class="text-decoration-none w-50 px-2 mb-3">
-                                        <div style="border-radius: 12px; overflow: hidden; width: 100%; height: 120px;">
-                                            <img src="{{ asset('public/product-thumbnail/' . $free->thumbnail) }}"
-                                                alt="{{ $free->judul_product }}" class="w-100 h-100 object-fit-cover"
-                                                style="border: 1px solid #eee">
-                                        </div>
-                                    </a>
-                                @endforeach
-                            @else
-                                <div class="text-muted w-100 text-center py-3">No free products available at the moment.
-                                </div>
-                            @endif
-                        </div>
-                    </div>
+                    @endif
+
                 </div>
             </div>
         </div>

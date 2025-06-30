@@ -74,14 +74,17 @@ class Landing extends BaseController
 
     public function detail_product($params)
     {
-        // Menambahkan logika penghapusan diskon kedaluwarsa di halaman detail
+        // Hapus diskon yang sudah kedaluwarsa
         DiskonProduk::where('akhir_tanggal', '<', Carbon::now('Asia/Jakarta'))->delete();
 
-        $data = Product::with('diskon')->where('slug', $params)->firstOrFail();
+        // Ambil produk beserta relasi kategori & diskon
+        $data = Product::with(['diskon', 'kategori'])->where('slug', $params)->firstOrFail();
         $module = $data->judul_product;
 
+        // Hitung harga asli
         $data->original_price = (float) str_replace(['$', ','], '', $data->price);
 
+        // Hitung diskon jika masih berlaku
         if ($data->diskon && $data->diskon->akhir_tanggal->isFuture()) {
             $data->discount_percentage = (float) $data->diskon->diskon_persen;
             $data->final_price = $data->original_price - ($data->original_price * $data->discount_percentage / 100);
@@ -91,9 +94,11 @@ class Landing extends BaseController
             $data->has_discount = false;
         }
 
+        // Ambil produk gratis lain untuk rekomendasi
         $free_products = Product::whereHas('kategori', function($query) {
             $query->where('nama_kategori', 'Free');
-        })->where('id', '!=', $data->id)
+        })
+        ->where('id', '!=', $data->id)
         ->take(2)
         ->get();
 
