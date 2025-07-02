@@ -80,6 +80,10 @@
 
 @section('script')
     <script>
+        // Definisikan base URL aplikasi menggunakan helper Laravel.
+        // Ini akan menghasilkan URL yang benar baik di lokal maupun di hosting.
+        const APP_URL = "{{ url('/') }}";
+
         let control = new Control();
 
         // --- Event handler untuk tombol diskon (Logika Diperbarui) ---
@@ -91,10 +95,15 @@
             let modalTitle = $('#modalDiskonLabel');
             let saveBtn = $('#saveDiscountBtn');
 
-            form.find('input[name="_method"]').remove();
+            form.find('input[name="_method"]').remove(); // Hapus method spoofing lama jika ada
+
+            // Gunakan APP_URL yang sudah kita definisikan untuk membuat URL AJAX yang dinamis
+            const checkUrl = `${APP_URL}/admin/diskon-produk/check/${productUuid}`;
+            const storeUrl = `${APP_URL}/admin/diskon-produk/store`;
+            const updateUrl = (discountUuid) => `${APP_URL}/admin/diskon-produk/update/${discountUuid}`;
 
             $.ajax({
-                url: `/admin/diskon-produk/check/${productUuid}`,
+                url: checkUrl, // URL yang sudah diperbaiki
                 type: 'GET',
                 success: function(response) {
                     $('#product_uuid').val(productUuid);
@@ -102,15 +111,23 @@
                     if (response.has_discount) {
                         modalTitle.text('Edit Diskon Produk');
                         saveBtn.html('<i class="fa fa-save me-1"></i>Update Diskon');
-                        form.attr('action',
-                            `/admin/diskon-produk/update/${response.discount_data.uuid}`);
+                        form.attr('action', updateUrl(response.discount_data.uuid));
                         form.prepend('<input type="hidden" name="_method" value="PUT">');
                         $('#diskon_persen').val(response.discount_data.diskon_persen);
-                        $('#akhir_tanggal').val(response.discount_data.akhir_tanggal);
+
+                        // Pastikan format tanggal dari server sesuai untuk datetime-local
+                        // Format yang dibutuhkan: YYYY-MM-DDTHH:mm
+                        let tgl = response.discount_data.akhir_tanggal;
+                        // Jika formatnya 'YYYY-MM-DD HH:mm:ss', ubah menjadi 'YYYY-MM-DDTHH:mm'
+                        if (tgl && tgl.includes(' ')) {
+                            tgl = tgl.substring(0, 16).replace(' ', 'T');
+                        }
+                        $('#akhir_tanggal').val(tgl);
+
                     } else {
                         modalTitle.text('Tambah Diskon Produk');
                         saveBtn.html('<i class="fa fa-save me-1"></i>Simpan Diskon');
-                        form.attr('action', '/admin/diskon-produk/store');
+                        form.attr('action', storeUrl);
                         form[0].reset();
                         $('#product_uuid').val(productUuid);
                     }
@@ -118,17 +135,16 @@
                     // --- PERBAIKAN LOGIKA WAKTU ---
                     // Kode ini akan membuat string waktu "saat ini" berdasarkan zona waktu Jakarta (WIB)
                     // dan mengaturnya sebagai nilai minimum pada input tanggal.
-                    const nowInJakarta = new Date().toLocaleString("en-US", {
+                    const nowInJakarta = new Date(new Date().toLocaleString("en-US", {
                         timeZone: "Asia/Jakarta"
-                    });
-                    const dateInJakarta = new Date(nowInJakarta);
+                    }));
 
                     // Format tanggal ke dalam YYYY-MM-DDTHH:mm yang dibutuhkan oleh input datetime-local
-                    const year = dateInJakarta.getFullYear();
-                    const month = String(dateInJakarta.getMonth() + 1).padStart(2, '0');
-                    const day = String(dateInJakarta.getDate()).padStart(2, '0');
-                    const hours = String(dateInJakarta.getHours()).padStart(2, '0');
-                    const minutes = String(dateInJakarta.getMinutes()).padStart(2, '0');
+                    const year = nowInJakarta.getFullYear();
+                    const month = String(nowInJakarta.getMonth() + 1).padStart(2, '0');
+                    const day = String(nowInJakarta.getDate()).padStart(2, '0');
+                    const hours = String(nowInJakarta.getHours()).padStart(2, '0');
+                    const minutes = String(nowInJakarta.getMinutes()).padStart(2, '0');
 
                     const jakartaMinTime = `${year}-${month}-${day}T${hours}:${minutes}`;
 
@@ -137,18 +153,22 @@
 
                     modal.modal('show');
                 },
-                error: function() {
-                    Swal.fire('Error', 'Gagal mengecek status diskon produk.', 'error');
+                error: function(xhr) { // Tambahkan xhr untuk melihat detail error
+                    console.error("AJAX Error:", xhr.status, xhr.responseText); // Log error ke console
+                    Swal.fire('Error',
+                        'Gagal mengecek status diskon produk. Cek console browser untuk detail.',
+                        'error');
                 }
             });
         });
 
-        // --- (Sisa script Anda tidak perlu diubah) ---
+        // --- Event handler untuk submit form ---
         $('#discountForm').on('submit', function(e) {
             e.preventDefault();
             let form = $(this);
-            let url = form.attr('action');
-            let method = form.attr('method');
+            let url = form.attr('action'); // URL sudah di-set dengan benar sebelumnya
+            // Method POST selalu digunakan karena kita memakai _method:PUT untuk update
+            let method = 'POST';
             let data = form.serialize();
             let saveBtn = $('#saveDiscountBtn');
 
@@ -181,21 +201,23 @@
                     Swal.fire('Gagal!', errorMessage, 'error');
                 },
                 complete: function() {
-                    let originalButtonText = modalTitle.text().includes('Edit') ? 'Update Diskon' :
-                        'Simpan Diskon';
+                    // Cek title modal untuk menentukan teks tombol
+                    let originalButtonText = $('#modalDiskonLabel').text().includes('Edit') ?
+                        'Update Diskon' : 'Simpan Diskon';
                     saveBtn.prop('disabled', false).html(
                         `<i class="fa fa-save me-1"></i>${originalButtonText}`);
                 }
             });
         });
 
+        // --- Sisa Script Anda (Tidak ada perubahan signifikan) ---
         $(document).on('click', '#button-side-form', function() {
-            window.location.href = '/admin/add-product';
+            window.location.href = `${APP_URL}/admin/add-product`;
         });
 
         $(document).on('click', '.button-delete', function(e) {
             e.preventDefault();
-            let url = '/admin/delete-product/' + $(this).attr('data-uuid');
+            let url = `${APP_URL}/admin/delete-product/` + $(this).attr('data-uuid');
             let label = $(this).attr('data-label');
             control.ajaxDelete(url, label);
         });
@@ -211,7 +233,7 @@
                     [0, 'asc']
                 ],
                 processing: true,
-                ajax: '/admin/get-product',
+                ajax: `${APP_URL}/admin/get-product`, // Perbaiki URL di sini juga
                 columns: [{
                         data: null,
                         render: (data, type, row, meta) => meta.row + meta.settings._iDisplayStart + 1
@@ -224,7 +246,7 @@
                         data: 'thumbnail',
                         className: 'text-center',
                         render: (data) =>
-                            `<a class="d-block overlay fancybox" data-fancybox="lightbox-group" href="/public/product-thumbnail/${data}"><div class="overlay-wrapper bgi-no-repeat bgi-position-center bgi-size-cover card-rounded min-h-175px" style="background-image:url('/public/product-thumbnail/${data}')"></div><div class="overlay-layer card-rounded bg-dark bg-opacity-25 shadow"><i class="bi bi-eye-fill text-white fs-3x"></i></div></a>`
+                            `<a class="d-block overlay fancybox" data-fancybox="lightbox-group" href="${APP_URL}/public/product-thumbnail/${data}"><div class="overlay-wrapper bgi-no-repeat bgi-position-center bgi-size-cover card-rounded min-h-175px" style="background-image:url('${APP_URL}/public/product-thumbnail/${data}')"></div><div class="overlay-layer card-rounded bg-dark bg-opacity-25 shadow"><i class="bi bi-eye-fill text-white fs-3x"></i></div></a>`
                     },
                     {
                         data: 'price',
@@ -245,9 +267,11 @@
                     orderable: false,
                     className: 'text-center',
                     render: function(data, type, full, meta) {
+                        // Perbaiki semua URL di dalam render ini
+                        const editUrl = `${APP_URL}/admin/edit-product/${data}`;
                         return `
                             <div class="d-flex gap-2" style="flex-flow: wrap;">
-                                <a href="/admin/edit-product/${data}" class="btn btn-warning btn-icon btn-sm" title="Edit Produk">
+                                <a href="${editUrl}" class="btn btn-warning btn-icon btn-sm" title="Edit Produk">
                                     <i class="fa fa-edit"></i>
                                 </a>
                                 <a href="javascript:;" type="button" data-uuid="${data}" data-label="Product" class="btn btn-danger button-delete btn-icon btn-sm" title="Hapus Produk">
