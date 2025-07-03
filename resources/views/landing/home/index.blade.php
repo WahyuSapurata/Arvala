@@ -264,17 +264,17 @@
         <!--begin::Container-->
         <div class="container">
             <!--begin::Heading-->
-            <div class="d-flex justify-content-between align-items-center mb-17">
+            <div class="d-flex justify-content-center align-items-center mb-17">
                 <!--begin::Title-->
-                <h3 class="text-dark" id="how-it-works" data-kt-scroll-offset="{default: 100, lg: 150}">
-                    More Mockup</h3>
-                <a href="{{ route('shop') }}" class="btn btn-view-custom">View More <i
+                {{-- <h3 class="text-dark" id="how-it-works" data-kt-scroll-offset="{default: 100, lg: 150}">
+                    More Mockup</h3> --}}
+                <a href="{{ route('shop') }}" class="btn btn-view-custom">More Mockup <i
                         class="bi bi-arrow-right fs-4 ms-3"></i></a>
                 <!--end::Title-->
             </div>
             <!--end::Heading-->
             <!--begin::Row-->
-            <div class="row gy-10 mb-md-20">
+            {{-- <div class="row gy-10 mb-md-20">
 
                 @forelse ($more_product as $more)
                     <div class="col-sm-12 col-md-6 col-lg-4">
@@ -341,7 +341,7 @@
                     </div>
                 @endforelse
 
-            </div>
+            </div> --}}
             <!--end::Row-->
         </div>
         <!--end::Container-->
