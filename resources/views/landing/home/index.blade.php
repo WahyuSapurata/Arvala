@@ -58,7 +58,7 @@
                 <!--begin::Title-->
                 <h3 class="text-dark" id="how-it-works" data-kt-scroll-offset="{default: 100, lg: 150}">
                     Bundle Mockup</h3>
-                <a href="{{ route('shop') }}" class="btn btn-view-custom">View More <i
+                <a href="{{ route('shop', ['nama_kategori' => 'Bundle']) }}" class="btn btn-view-custom">View More <i
                         class="bi bi-arrow-right fs-4 ms-3"></i></a>
                 <!--end::Title-->
             </div>
@@ -185,7 +185,7 @@
                 <!--begin::Title-->
                 <h3 class="text-dark" id="how-it-works" data-kt-scroll-offset="{default: 100, lg: 150}">
                     Free Mockup</h3>
-                <a href="{{ route('shop') }}" class="btn btn-view-custom">View More <i
+                <a href="{{ route('shop', ['nama_kategori' => 'Free']) }}" class="btn btn-view-custom">View More <i
                         class="bi bi-arrow-right fs-4 ms-3"></i></a>
                 <!--end::Title-->
             </div>
