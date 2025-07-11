@@ -311,9 +311,9 @@
                                     <i class="fa fa-percent"></i>
                                 </a>
                                 ${full.nama_kategori && full.nama_kategori.toLowerCase().trim() === 'bundle' ? `
-                                                    <a href="javascript:;" type="button" data-uuid="${data}" class="btn btn-info button-bundle btn-icon btn-sm" title="Atur Bundle">
-                                                        <i class="fa fa-box"></i>
-                                                    </a>` : ''}
+                                                            <a href="javascript:;" type="button" data-uuid="${data}" class="btn btn-info button-bundle btn-icon btn-sm" title="Atur Bundle">
+                                                                <i class="fa fa-box"></i>
+                                                            </a>` : ''}
                             </div>
                         `;
                     },
@@ -332,11 +332,11 @@
             form.find('input[name="_method"]').remove();
             $('#bundle_uuid').val(productUuid);
 
-            // Kosongkan multiselect
             $('#included_products').empty();
 
-            const fetchUrl = `${APP_URL}/admin/bundle/get/${productUuid}`;
-            const saveUrl = `${APP_URL}/admin/bundle/store`;
+            // ✅ URL sudah diperbaiki
+            const fetchUrl = `${APP_URL}/admin/product-bundle/get/${productUuid}`;
+            const saveUrl = `${APP_URL}/admin/product-bundle/store`;
 
             $.ajax({
                 url: fetchUrl,
