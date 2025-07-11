@@ -95,12 +95,13 @@ class Landing extends BaseController
         }
 
         // Ambil produk gratis lain untuk rekomendasi
-        $free_products = Product::whereHas('kategori', function($query) {
-            $query->where('nama_kategori', 'Free');
-        })
-        ->where('id', '!=', $data->id)
-        ->take(2)
-        ->get();
+        $free_products = $data->bundleItems()
+        ->with(['includedProduct.kategori'])
+        ->get()
+        ->pluck('includedProduct')
+        ->filter(function ($product) {
+            return strtolower(optional($product->kategori)->nama_kategori) === 'free';
+        });
 
         return view('landing.detailproduct.index', compact('data', 'module', 'free_products'));
     }

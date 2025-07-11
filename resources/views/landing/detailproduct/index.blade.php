@@ -77,13 +77,13 @@
                                         </a>
                                     @endforeach
                                 @else
-                                    <div class="text-muted w-100 text-center py-3">No free products available at the moment.
+                                    <div class="text-muted w-100 text-center py-3">
+                                        No free products available at the moment.
                                     </div>
                                 @endif
                             </div>
                         </div>
                     @endif
-
                 </div>
             </div>
         </div>

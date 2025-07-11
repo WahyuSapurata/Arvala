@@ -59,6 +59,12 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
         Route::get('/diskon-produk/show/{uuid}', 'DiskonProdukController@show')->name('diskon.show');
         Route::put('/diskon-produk/update/{uuid}', 'DiskonProdukController@update')->name('diskon.update');
         Route::delete('/diskon-produk/delete/{uuid}', 'DiskonProdukController@destroy')->name('diskon.destroy');
+
+        // Rute Bundle Produk
+        Route::prefix('bundle')->group(function () {
+            Route::get('/get/{uuid}', 'ProductBundleController@getBundle')->name('bundle.get');
+            Route::post('/store', 'ProductBundleController@storeBundle')->name('bundle.store');
+        });
     });
 
     Route::get('/logout', 'Auth@logout')->name('logout');

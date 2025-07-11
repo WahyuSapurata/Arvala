@@ -45,4 +45,15 @@ class Product extends Model
         return $this->hasOne(DiskonProduk::class, 'uuid_produk', 'uuid');
     }
 
+    public function bundleItems()
+    {
+        // Produk ini adalah bundle, memiliki banyak item
+        return $this->hasMany(BundleItem::class, 'uuid_bundle_product', 'uuid');
+    }
+
+    public function includedInBundles()
+    {
+        // Produk ini termasuk dalam banyak bundle
+        return $this->hasMany(BundleItem::class, 'uuid_included_product', 'uuid');
+    }
 }

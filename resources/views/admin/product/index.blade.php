@@ -76,6 +76,36 @@
             </form>
         </div>
     </div>
+
+    <div class="modal fade" id="modalBundle" tabindex="-1" aria-labelledby="modalBundleLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <form id="bundleForm" method="POST">
+                @csrf
+                <input type="hidden" name="bundle_uuid" id="bundle_uuid">
+
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalBundleLabel">Atur Free Produk</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Pilih Include Produk Free</label>
+                            <select class="form-select" name="included_products[]" id="included_products" multiple required>
+                                <!-- Akan diisi dinamis oleh JS -->
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" id="saveBundleBtn" class="btn btn-primary">
+                            <i class="fa fa-save me-1"></i>Simpan Bundle
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 @endsection
 
 @section('script')
@@ -267,7 +297,7 @@
                     orderable: false,
                     className: 'text-center',
                     render: function(data, type, full, meta) {
-                        // Perbaiki semua URL di dalam render ini
+
                         const editUrl = `${APP_URL}/admin/edit-product/${data}`;
                         return `
                             <div class="d-flex gap-2" style="flex-flow: wrap;">
@@ -280,12 +310,99 @@
                                 <a href="javascript:;" type="button" data-uuid="${data}" class="btn btn-success button-discount btn-icon btn-sm" title="Atur Diskon">
                                     <i class="fa fa-percent"></i>
                                 </a>
+                                ${full.nama_kategori && full.nama_kategori.toLowerCase().trim() === 'bundle' ? `
+                                                    <a href="javascript:;" type="button" data-uuid="${data}" class="btn btn-info button-bundle btn-icon btn-sm" title="Atur Bundle">
+                                                        <i class="fa fa-box"></i>
+                                                    </a>` : ''}
                             </div>
                         `;
                     },
                 }],
             });
         };
+
+        // Event handler tombol Atur Bundle
+        $(document).on('click', '.button-bundle', function(e) {
+            e.preventDefault();
+            let productUuid = $(this).data('uuid');
+            let form = $('#bundleForm');
+            let modal = $('#modalBundle');
+            let saveBtn = $('#saveBundleBtn');
+
+            form.find('input[name="_method"]').remove();
+            $('#bundle_uuid').val(productUuid);
+
+            // Kosongkan multiselect
+            $('#included_products').empty();
+
+            const fetchUrl = `${APP_URL}/admin/bundle/get/${productUuid}`;
+            const saveUrl = `${APP_URL}/admin/bundle/store`;
+
+            $.ajax({
+                url: fetchUrl,
+                type: 'GET',
+                success: function(response) {
+                    response.all_free_products.forEach((product) => {
+                        let selected = response.selected_products.includes(product.uuid) ?
+                            'selected' : '';
+                        $('#included_products').append(
+                            `<option value="${product.uuid}" ${selected}>${product.judul_product}</option>`
+                        );
+                    });
+
+                    form.attr('action', saveUrl);
+                    modal.modal('show');
+                },
+                error: function(xhr) {
+                    console.error("AJAX Error:", xhr.status, xhr.responseText);
+                    Swal.fire('Error', 'Gagal memuat data produk bundle.', 'error');
+                }
+            });
+        });
+
+        // Submit form Bundle
+        $('#bundleForm').on('submit', function(e) {
+            e.preventDefault();
+            let form = $(this);
+            let url = form.attr('action');
+            let data = form.serialize();
+            let saveBtn = $('#saveBundleBtn');
+
+            saveBtn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin me-1"></i>Menyimpan...');
+
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: data,
+                success: function(response) {
+                    if (response.status === 'success') {
+                        $('#modalBundle').modal('hide');
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil!',
+                            text: response.message,
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+                        $('#kt_table_data').DataTable().ajax.reload();
+                    } else {
+                        Swal.fire('Gagal!', response.message || 'Terjadi kesalahan.', 'error');
+                    }
+                },
+                error: function(xhr) {
+                    let errorMessage = 'Terjadi kesalahan.';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMessage = xhr.responseJSON.message;
+                    }
+                    Swal.fire('Gagal!', errorMessage, 'error');
+                },
+                complete: function() {
+                    saveBtn.prop('disabled', false).html(
+                        '<i class="fa fa-save me-1"></i>Simpan Bundle');
+                }
+            });
+        });
+
         $(function() {
             initDatatable();
         });
