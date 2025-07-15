@@ -110,8 +110,10 @@
 
 @section('script')
     <script>
-        // Definisikan base URL aplikasi menggunakan helper Laravel.
         const APP_URL = "{{ url('/') }}";
+
+        const BUNDLE_GET_URL_TEMPLATE = "{{ route('admin.product-bundle.get', ['uuid' => ':uuid']) }}";
+        const BUNDLE_STORE_URL = "{{ route('admin.product-bundle.store') }}";
 
         let control = new Control();
 
@@ -126,7 +128,6 @@
 
             form.find('input[name="_method"]').remove();
 
-            // Fixed URLs to match route definitions
             const checkUrl = `${APP_URL}/admin/diskon-produk/check/${productUuid}`;
             const storeUrl = `${APP_URL}/admin/diskon-produk/store`;
             const updateUrl = (discountUuid) => `${APP_URL}/admin/diskon-produk/update/${discountUuid}`;
@@ -156,7 +157,6 @@
                         $('#product_uuid').val(productUuid);
                     }
 
-                    // Set minimum date to current Jakarta time
                     const nowInJakarta = new Date(new Date().toLocaleString("en-US", {
                         timeZone: "Asia/Jakarta"
                     }));
@@ -166,7 +166,6 @@
                     const day = String(nowInJakarta.getDate()).padStart(2, '0');
                     const hours = String(nowInJakarta.getHours()).padStart(2, '0');
                     const minutes = String(nowInJakarta.getMinutes()).padStart(2, '0');
-
                     const jakartaMinTime = `${year}-${month}-${day}T${hours}:${minutes}`;
                     $('#akhir_tanggal').attr('min', jakartaMinTime);
 
@@ -186,7 +185,7 @@
             e.preventDefault();
             let form = $(this);
             let url = form.attr('action');
-            let method = 'POST';
+            let method = $('input[name="_method"]').val() || 'POST';
             let data = form.serialize();
             let saveBtn = $('#saveDiscountBtn');
 
@@ -227,7 +226,7 @@
             });
         });
 
-        // --- Other event handlers ---
+
         $(document).on('click', '#button-side-form', function() {
             window.location.href = `${APP_URL}/admin/add-product`;
         });
@@ -307,7 +306,7 @@
             });
         };
 
-        // --- Event handler untuk tombol Bundle (Fixed URLs) ---
+        // --- [PERBAIKAN] Event handler untuk tombol Bundle menggunakan URL dari route() ---
         $(document).on('click', '.button-bundle', function(e) {
             e.preventDefault();
             let productUuid = $(this).data('uuid');
@@ -315,125 +314,76 @@
             let modal = $('#modalBundle');
             let saveBtn = $('#saveBundleBtn');
 
-            if (!productUuid || productUuid.length === 0) {
-                Swal.fire('Error', 'UUID produk tidak valid', 'error');
+            if (!productUuid) {
+                Swal.fire('Error', 'UUID produk tidak valid.', 'error');
                 return;
             }
 
-            console.log('Bundle button clicked for UUID:', productUuid);
+            // [PERBAIKAN] Buat URL fetch dengan mengganti placeholder :uuid
+            const fetchUrl = BUNDLE_GET_URL_TEMPLATE.replace(':uuid', productUuid);
 
-            form.find('input[name="_method"]').remove();
+            // [PERBAIKAN] Atur action form ke URL store yang sudah didefinisikan
+            form.attr('action', BUNDLE_STORE_URL);
+
             $('#bundle_uuid').val(productUuid);
-            $('#included_products').empty();
-
-            // Fixed URLs to match route definitions
-            const fetchUrl = `${APP_URL}/admin/product-bundle/get/${productUuid}`;
-            const saveUrl = `${APP_URL}/admin/product-bundle/store`;
-
-            console.log('Fetch URL:', fetchUrl);
-
-            $('#included_products').append('<option value="">Memuat...</option>');
+            $('#included_products').empty().append('<option value="">Memuat...</option>');
 
             $.ajax({
-                url: fetchUrl,
+                url: fetchUrl, // Gunakan URL yang sudah diperbaiki
                 type: 'GET',
                 timeout: 10000,
                 success: function(response) {
-                    console.log('AJAX Success Response:', response);
-
                     $('#included_products').empty();
 
                     if (response.status === 'success') {
                         if (response.all_free_products && response.all_free_products.length > 0) {
                             response.all_free_products.forEach((product) => {
-                                let selected = response.selected_products.includes(product
-                                    .uuid) ? 'selected' : '';
+                                let selected = response.selected_products.includes(product.uuid) ? 'selected' : '';
                                 $('#included_products').append(
                                     `<option value="${product.uuid}" ${selected}>${product.judul_product}</option>`
                                 );
                             });
                         } else {
-                            $('#included_products').append(
-                                '<option value="">Tidak ada produk free tersedia</option>'
-                            );
+                            $('#included_products').append('<option value="" disabled>Tidak ada produk free tersedia</option>');
                         }
-
-                        form.attr('action', saveUrl);
-                        modal.modal('show');
-                    } else if (response.status === 'warning') {
-                        $('#included_products').append(
-                            '<option value="">Tidak ada produk free tersedia</option>'
-                        );
-                        form.attr('action', saveUrl);
-                        modal.modal('show');
-
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Peringatan',
-                            text: response.message || 'Tidak ada produk free yang tersedia',
-                            showConfirmButton: true
-                        });
                     } else {
-                        Swal.fire('Error', response.message || 'Terjadi kesalahan dari server',
-                        'error');
+                         $('#included_products').append('<option value="" disabled>Tidak ada produk free tersedia</option>');
+                         if (response.message) {
+                             Swal.fire('Informasi', response.message, 'info');
+                         }
                     }
+                    modal.modal('show');
                 },
                 error: function(xhr, status, error) {
-                    console.error("AJAX Error Details:");
-                    console.error("Status:", status);
-                    console.error("Error:", error);
-                    console.error("Response Status:", xhr.status);
-                    console.error("Response Text:", xhr.responseText);
-
-                    $('#included_products').empty();
-                    $('#included_products').append('<option value="">Gagal memuat data</option>');
-
                     let errorMessage = 'Gagal memuat data produk bundle.';
-
                     if (xhr.status === 404) {
-                        errorMessage = 'Halaman tidak ditemukan. Periksa URL atau route.';
-                    } else if (xhr.status === 500) {
-                        errorMessage = 'Terjadi kesalahan server. Periksa log aplikasi.';
-                    } else if (xhr.status === 0) {
-                        errorMessage = 'Tidak dapat terhubung ke server. Periksa koneksi internet.';
-                    } else if (status === 'timeout') {
-                        errorMessage = 'Request timeout. Coba lagi nanti.';
+                        // Pesan ini sekarang lebih relevan
+                        errorMessage = 'Endpoint tidak ditemukan. Pastikan route name `admin.product-bundle.get` sudah benar.';
                     } else if (xhr.responseJSON && xhr.responseJSON.message) {
                         errorMessage = xhr.responseJSON.message;
                     }
-
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: errorMessage,
-                        footer: `<small>Debug: ${xhr.status} - ${error}</small>`
-                    });
+                    Swal.fire('Error', errorMessage, 'error');
                 }
             });
         });
 
-        // --- Submit form Bundle ---
+
+        // --- [PERBAIKAN] Submit form Bundle ---
         $('#bundleForm').on('submit', function(e) {
             e.preventDefault();
             let form = $(this);
-            let url = form.attr('action');
+            let url = form.attr('action'); // URL diambil dari atribut action yang sudah diatur
             let data = form.serialize();
             let saveBtn = $('#saveBundleBtn');
-
-            console.log('Bundle form submitted');
-            console.log('Form data:', data);
-            console.log('Submit URL:', url);
 
             saveBtn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin me-1"></i>Menyimpan...');
 
             $.ajax({
-                url: url,
+                url: url, // Gunakan URL dari form
                 type: 'POST',
                 data: data,
                 timeout: 10000,
                 success: function(response) {
-                    console.log('Bundle save response:', response);
-
                     if (response.status === 'success') {
                         $('#modalBundle').modal('hide');
                         Swal.fire({
@@ -448,29 +398,21 @@
                         Swal.fire('Gagal!', response.message || 'Terjadi kesalahan.', 'error');
                     }
                 },
-                error: function(xhr, status, error) {
-                    console.error("Bundle Save Error:");
-                    console.error("Status:", status);
-                    console.error("Error:", error);
-                    console.error("Response:", xhr.responseText);
-
+                error: function(xhr) {
                     let errorMessage = 'Terjadi kesalahan saat menyimpan.';
-
                     if (xhr.responseJSON && xhr.responseJSON.message) {
                         errorMessage = xhr.responseJSON.message;
                     } else if (xhr.responseJSON && xhr.responseJSON.errors) {
-                        let errors = xhr.responseJSON.errors;
-                        errorMessage = Object.values(errors).flat().join(', ');
+                        errorMessage = Object.values(xhr.responseJSON.errors).flat().join(' ');
                     }
-
                     Swal.fire('Gagal!', errorMessage, 'error');
                 },
                 complete: function() {
-                    saveBtn.prop('disabled', false).html(
-                        '<i class="fa fa-save me-1"></i>Simpan Bundle');
+                    saveBtn.prop('disabled', false).html('<i class="fa fa-save me-1"></i>Simpan Bundle');
                 }
             });
         });
+
 
         $(function() {
             initDatatable();
