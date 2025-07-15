@@ -311,9 +311,9 @@
                                     <i class="fa fa-percent"></i>
                                 </a>
                                 ${full.nama_kategori && full.nama_kategori.toLowerCase().trim() === 'bundle' ? `
-                                                            <a href="javascript:;" type="button" data-uuid="${data}" class="btn btn-info button-bundle btn-icon btn-sm" title="Atur Bundle">
-                                                                <i class="fa fa-box"></i>
-                                                            </a>` : ''}
+                                <a href="javascript:;" type="button" data-uuid="${data}" class="btn btn-info button-bundle btn-icon btn-sm" title="Atur Bundle">
+                                    <i class="fa fa-box"></i>
+                                </a>` : ''}
                             </div>
                         `;
                     },
@@ -321,7 +321,7 @@
             });
         };
 
-        // Event handler tombol Atur Bundle
+        // Event handler tombol Atur Bundle - Improved Version
         $(document).on('click', '.button-bundle', function(e) {
             e.preventDefault();
             let productUuid = $(this).data('uuid');
@@ -329,82 +329,168 @@
             let modal = $('#modalBundle');
             let saveBtn = $('#saveBundleBtn');
 
+            // Validasi UUID
+            if (!productUuid || productUuid.length === 0) {
+                Swal.fire('Error', 'UUID produk tidak valid', 'error');
+                return;
+            }
+
+            console.log('Bundle button clicked for UUID:', productUuid);
+
             form.find('input[name="_method"]').remove();
             $('#bundle_uuid').val(productUuid);
-
             $('#included_products').empty();
 
-            // ✅ URL sudah diperbaiki
             const fetchUrl = `${APP_URL}/admin/product-bundle/get/${productUuid}`;
             const saveUrl = `${APP_URL}/admin/product-bundle/store`;
+
+            console.log('Fetch URL:', fetchUrl);
+
+            // Show loading state
+            $('#included_products').append('<option value="">Memuat...</option>');
 
             $.ajax({
                 url: fetchUrl,
                 type: 'GET',
+                timeout: 10000, // 10 detik timeout
                 success: function(response) {
-                    response.all_free_products.forEach((product) => {
-                        let selected = response.selected_products.includes(product.uuid) ?
-                            'selected' : '';
-                        $('#included_products').append(
-                            `<option value="${product.uuid}" ${selected}>${product.judul_product}</option>`
-                        );
-                    });
+                    console.log('AJAX Success Response:', response);
 
-                    form.attr('action', saveUrl);
-                    modal.modal('show');
-                },
-                error: function(xhr) {
-                    console.error("AJAX Error:", xhr.status, xhr.responseText);
-                    Swal.fire('Error', 'Gagal memuat data produk bundle.', 'error');
-                }
-            });
-        });
+                    $('#included_products').empty();
 
-        // Submit form Bundle
-        $('#bundleForm').on('submit', function(e) {
-            e.preventDefault();
-            let form = $(this);
-            let url = form.attr('action');
-            let data = form.serialize();
-            let saveBtn = $('#saveBundleBtn');
-
-            saveBtn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin me-1"></i>Menyimpan...');
-
-            $.ajax({
-                url: url,
-                type: 'POST',
-                data: data,
-                success: function(response) {
                     if (response.status === 'success') {
-                        $('#modalBundle').modal('hide');
+                        // Jika ada produk free
+                        if (response.all_free_products && response.all_free_products.length > 0) {
+                            response.all_free_products.forEach((product) => {
+                                let selected = response.selected_products.includes(product
+                                    .uuid) ? 'selected' : '';
+                                $('#included_products').append(
+                                    `<option value="${product.uuid}" ${selected}>${product.judul_product}</option>`
+                                );
+                            });
+                        } else {
+                            $('#included_products').append(
+                                '<option value="">Tidak ada produk free tersedia</option>');
+                        }
+
+                        form.attr('action', saveUrl);
+                        modal.modal('show');
+                    } else if (response.status === 'warning') {
+                        // Handle warning case (no free products)
+                        $('#included_products').append(
+                            '<option value="">Tidak ada produk free tersedia</option>');
+                        form.attr('action', saveUrl);
+                        modal.modal('show');
+
+                        // Show warning message
                         Swal.fire({
-                            icon: 'success',
-                            title: 'Berhasil!',
-                            text: response.message,
-                            showConfirmButton: false,
-                            timer: 2000
+                            icon: 'warning',
+                            title: 'Peringatan',
+                            text: response.message || 'Tidak ada produk free yang tersedia',
+                            showConfirmButton: true
                         });
-                        $('#kt_table_data').DataTable().ajax.reload();
                     } else {
-                        Swal.fire('Gagal!', response.message || 'Terjadi kesalahan.', 'error');
+                        // Handle error from server
+                        Swal.fire('Error', response.message || 'Terjadi kesalahan dari server',
+                            'error');
                     }
                 },
-                error: function(xhr) {
-                    let errorMessage = 'Terjadi kesalahan.';
-                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                error: function(xhr, status, error) {
+                    console.error("AJAX Error Details:");
+                    console.error("Status:", status);
+                    console.error("Error:", error);
+                    console.error("Response Status:", xhr.status);
+                    console.error("Response Text:", xhr.responseText);
+
+                    $('#included_products').empty();
+                    $('#included_products').append('<option value="">Gagal memuat data</option>');
+
+                    let errorMessage = 'Gagal memuat data produk bundle.';
+
+                    if (xhr.status === 404) {
+                        errorMessage = 'Halaman tidak ditemukan. Periksa URL atau route.';
+                    } else if (xhr.status === 500) {
+                        errorMessage = 'Terjadi kesalahan server. Periksa log aplikasi.';
+                    } else if (xhr.status === 0) {
+                        errorMessage = 'Tidak dapat terhubung ke server. Periksa koneksi internet.';
+                    } else if (status === 'timeout') {
+                        errorMessage = 'Request timeout. Coba lagi nanti.';
+                    } else if (xhr.responseJSON && xhr.responseJSON.message) {
                         errorMessage = xhr.responseJSON.message;
                     }
-                    Swal.fire('Gagal!', errorMessage, 'error');
-                },
-                complete: function() {
-                    saveBtn.prop('disabled', false).html(
-                        '<i class="fa fa-save me-1"></i>Simpan Bundle');
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: errorMessage,
+                        footer: `<small>Debug: ${xhr.status} - ${error}</small>`
+                    });
                 }
             });
         });
 
-        $(function() {
-            initDatatable();
-        });
+        // Submit form Bundle - Improved Version
+        $('#bundleForm').on('submit', function(e) {
+                    e.preventDefault();
+                    let form = $(this);
+                    let url = form.attr('action');
+                    let data = form.serialize();
+                    let saveBtn = $('#saveBundleBtn');
+
+                    console.log('Bundle form submitted');
+                    console.log('Form data:', data);
+                    console.log('Submit URL:', url);
+
+                    saveBtn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin me-1"></i>Menyimpan...');
+
+                    $.ajax({
+                        url: url,
+                        type: 'POST',
+                        data: data,
+                        timeout: 10000,
+                        success: function(response) {
+                            console.log('Bundle save response:', response);
+
+                            if (response.status === 'success') {
+                                $('#modalBundle').modal('hide');
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Berhasil!',
+                                    text: response.message,
+                                    showConfirmButton: false,
+                                    timer: 2000
+                                });
+                                $('#kt_table_data').DataTable().ajax.reload();
+                            } else {
+                                Swal.fire('Gagal!', response.message || 'Terjadi kesalahan.', 'error');
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("Bundle Save Error:");
+                            console.error("Status:", status);
+                            console.error("Error:", error);
+                            console.error("Response:", xhr.responseText);
+
+                            let errorMessage = 'Terjadi kesalahan saat menyimpan.';
+
+                            if (xhr.responseJSON && xhr.responseJSON.message) {
+                                errorMessage = xhr.responseJSON.message;
+                            } else if (xhr.responseJSON && xhr.responseJSON.errors) {
+                                // Handle validation errors
+                                let errors = xhr.responseJSON.errors;
+                                errorMessage = Object.values(errors).flat().join(', ');
+                            }
+
+                            Swal.fire('Gagal!', errorMessage, 'error');
+                        },
+                        complete: function() {
+                            saveBtn.prop('disabled', false).html(
+                                '<i class="fa fa-save me-1"></i>Simpan Bundle');
+                        }
+                    });
+
+                    $(function() {
+                        initDatatable();
+                    });
     </script>
 @endsection
