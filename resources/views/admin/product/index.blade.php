@@ -113,18 +113,10 @@
         const APP_URL = "{{ url('/') }}";
         let control = new Control();
 
-        // =================================================================================================
-        // [PERBAIKAN KUNCI]
-        // Menggunakan helper `route()` untuk membuat template URL yang andal untuk fitur BUNDLE.
-        // Ini adalah "cara Laravel" yang benar dan akan menyelesaikan masalah 404.
-        // Placeholder ':uuid' akan kita ganti menggunakan JavaScript.
-        // Pastikan nama route di web.php sudah benar: 'admin.product-bundle.get' dan 'admin.product-bundle.store'
-        // =================================================================================================
         const BUNDLE_GET_URL_TEMPLATE = "{{ route('admin.product-bundle.get', ['uuid' => ':uuid']) }}";
         const BUNDLE_STORE_URL = "{{ route('admin.product-bundle.store') }}";
-        // =================================================================================================
 
-        // --- Event handler untuk tombol diskon (Tetap menggunakan cara lama, karena dilaporkan berfungsi) ---
+        // --- Event handler untuk tombol diskon (DIPERBAIKI) ---
         $(document).on('click', '.button-discount', function(e) {
             e.preventDefault();
             let productUuid = $(this).data('uuid');
@@ -133,22 +125,29 @@
             let modalTitle = $('#modalDiskonLabel');
             let saveBtn = $('#saveDiscountBtn');
 
+            // Hapus method field yang mungkin ada
             form.find('input[name="_method"]').remove();
 
+            // URL yang benar sesuai dengan routes
             const checkUrl = `${APP_URL}/admin/diskon-produk/check/${productUuid}`;
             const storeUrl = `${APP_URL}/admin/diskon-produk/store`;
             const updateUrl = (discountUuid) => `${APP_URL}/admin/diskon-produk/update/${discountUuid}`;
 
+            // AJAX untuk mengecek apakah produk sudah memiliki diskon
             $.ajax({
                 url: checkUrl,
                 type: 'GET',
                 success: function(response) {
                     $('#product_uuid').val(productUuid);
+
                     if (response.has_discount) {
+                        // Mode edit - produk sudah memiliki diskon
                         modalTitle.text('Edit Diskon Produk');
                         saveBtn.html('<i class="fa fa-save me-1"></i>Update Diskon');
                         form.attr('action', updateUrl(response.discount_data.uuid));
                         form.prepend('<input type="hidden" name="_method" value="PUT">');
+
+                        // Isi form dengan data existing
                         $('#diskon_persen').val(response.discount_data.diskon_persen);
                         let tgl = response.discount_data.akhir_tanggal;
                         if (tgl && tgl.includes(' ')) {
@@ -156,12 +155,15 @@
                         }
                         $('#akhir_tanggal').val(tgl);
                     } else {
+                        // Mode create - produk belum memiliki diskon
                         modalTitle.text('Tambah Diskon Produk');
                         saveBtn.html('<i class="fa fa-save me-1"></i>Simpan Diskon');
                         form.attr('action', storeUrl);
                         form[0].reset();
                         $('#product_uuid').val(productUuid);
                     }
+
+                    // Set minimum datetime ke waktu sekarang (timezone Jakarta)
                     const nowInJakarta = new Date(new Date().toLocaleString("en-US", {
                         timeZone: "Asia/Jakarta"
                     }));
@@ -172,6 +174,7 @@
                     const minutes = String(nowInJakarta.getMinutes()).padStart(2, '0');
                     const jakartaMinTime = `${year}-${month}-${day}T${hours}:${minutes}`;
                     $('#akhir_tanggal').attr('min', jakartaMinTime);
+
                     modal.modal('show');
                 },
                 error: function(xhr) {
@@ -181,18 +184,22 @@
             });
         });
 
-        // --- Submit form diskon ---
+        // --- Submit form diskon (DIPERBAIKI) ---
         $('#discountForm').on('submit', function(e) {
             e.preventDefault();
             let form = $(this);
             let url = form.attr('action');
-            let method = $('input[name="_method"]').val() || 'POST';
+            let methodInput = form.find('input[name="_method"]');
+            let method = methodInput.length > 0 ? methodInput.val() : 'POST';
             let data = form.serialize();
             let saveBtn = $('#saveDiscountBtn');
+
             saveBtn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin me-1"></i>Menyimpan...');
+
+            // Untuk method PUT, kita tetap menggunakan POST dengan _method field
             $.ajax({
                 url: url,
-                type: method,
+                type: 'POST', // Selalu gunakan POST untuk Laravel
                 data: data,
                 success: function(response) {
                     if (response.status === 'success') {
@@ -213,6 +220,9 @@
                     let errorMessage = 'Terjadi kesalahan. Silakan coba lagi.';
                     if (xhr.responseJSON && xhr.responseJSON.message) {
                         errorMessage = xhr.responseJSON.message;
+                    } else if (xhr.responseJSON && xhr.responseJSON.errors) {
+                        // Handle validation errors
+                        errorMessage = Object.values(xhr.responseJSON.errors).flat().join(' ');
                     }
                     Swal.fire('Gagal!', errorMessage, 'error');
                 },
@@ -220,29 +230,51 @@
                     let originalButtonText = $('#modalDiskonLabel').text().includes('Edit') ?
                         'Update Diskon' : 'Simpan Diskon';
                     saveBtn.prop('disabled', false).html(
-                        `<i class="fa fa-save me-1"></i>${originalButtonText}`);
+                        `<i class="fa fa-save me-1"></i>${originalButtonText}`
+                    );
                 }
             });
         });
 
-        // --- Datatable dan event handler lainnya ---
+        // --- Datatable initialization ---
         const initDatatable = async () => {
             if ($.fn.DataTable.isDataTable('#kt_table_data')) {
                 $('#kt_table_data').DataTable().clear().destroy();
             }
+
             $('#kt_table_data').DataTable({
                 responsive: true,
                 pageLength: 10,
-                order: [[0, 'asc']],
+                order: [
+                    [0, 'asc']
+                ],
                 processing: true,
                 ajax: `${APP_URL}/admin/get-product`,
-                columns: [
-                    { data: null, render: (data, type, row, meta) => meta.row + meta.settings._iDisplayStart + 1 },
-                    { data: 'judul_product', className: 'text-center' },
-                    { data: 'thumbnail', className: 'text-center', render: (data) => `<a class="d-block overlay fancybox" data-fancybox="lightbox-group" href="${APP_URL}/public/product-thumbnail/${data}"><div class="overlay-wrapper bgi-no-repeat bgi-position-center bgi-size-cover card-rounded min-h-175px" style="background-image:url('${APP_URL}/public/product-thumbnail/${data}')"></div><div class="overlay-layer card-rounded bg-dark bg-opacity-25 shadow"><i class="bi bi-eye-fill text-white fs-3x"></i></div></a>` },
-                    { data: 'price', className: 'text-center' },
-                    { data: 'nama_kategori', className: 'text-center' },
-                    { data: 'uuid' }
+                columns: [{
+                        data: null,
+                        render: (data, type, row, meta) => meta.row + meta.settings._iDisplayStart + 1
+                    },
+                    {
+                        data: 'judul_product',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'thumbnail',
+                        className: 'text-center',
+                        render: (data) =>
+                            `<a class="d-block overlay fancybox" data-fancybox="lightbox-group" href="${APP_URL}/public/product-thumbnail/${data}"><div class="overlay-wrapper bgi-no-repeat bgi-position-center bgi-size-cover card-rounded min-h-175px" style="background-image:url('${APP_URL}/public/product-thumbnail/${data}')"></div><div class="overlay-layer card-rounded bg-dark bg-opacity-25 shadow"><i class="bi bi-eye-fill text-white fs-3x"></i></div></a>`
+                    },
+                    {
+                        data: 'price',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'nama_kategori',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'uuid'
+                    }
                 ],
                 columnDefs: [{
                     targets: -1,
@@ -253,18 +285,31 @@
                     render: function(data, type, full, meta) {
                         const editUrl = `${APP_URL}/admin/edit-product/${data}`;
                         return `
-                        <div class="d-flex gap-2" style="flex-flow: wrap;">
-                            <a href="${editUrl}" class="btn btn-warning btn-icon btn-sm" title="Edit Produk"><i class="fa fa-edit"></i></a>
-                            <a href="javascript:;" type="button" data-uuid="${data}" data-label="Product" class="btn btn-danger button-delete btn-icon btn-sm" title="Hapus Produk"><i class="fa fa-trash"></i></a>
-                            <a href="javascript:;" type="button" data-uuid="${data}" class="btn btn-success button-discount btn-icon btn-sm" title="Atur Diskon"><i class="fa fa-percent"></i></a>
-                            ${full.nama_kategori && full.nama_kategori.toLowerCase().trim() === 'bundle' ? `<a href="javascript:;" type="button" data-uuid="${data}" class="btn btn-info button-bundle btn-icon btn-sm" title="Atur Bundle"><i class="fa fa-box"></i></a>` : ''}
-                        </div>`;
+                <div class="d-flex gap-2" style="flex-flow: wrap;">
+                    <a href="${editUrl}" class="btn btn-warning btn-icon btn-sm" title="Edit Produk">
+                        <i class="fa fa-edit"></i>
+                    </a>
+                    <a href="javascript:;" type="button" data-uuid="${data}" data-label="Product" class="btn btn-danger button-delete btn-icon btn-sm" title="Hapus Produk">
+                        <i class="fa fa-trash"></i>
+                    </a>
+                    <a href="javascript:;" type="button" data-uuid="${data}" class="btn btn-success button-discount btn-icon btn-sm" title="Atur Diskon">
+                        <i class="fa fa-percent"></i>
+                    </a>
+                    ${full.nama_kategori && full.nama_kategori.toLowerCase().trim() === 'bundle' ?
+                        `<a href="javascript:;" type="button" data-uuid="${data}" class="btn btn-info button-bundle btn-icon btn-sm" title="Atur Bundle">
+                                <i class="fa fa-box"></i>
+                            </a>` : ''}
+                </div>`;
                     },
                 }],
             });
         };
 
-        $(document).on('click', '#button-side-form', function() { window.location.href = `${APP_URL}/admin/add-product`; });
+        // --- Event handlers ---
+        $(document).on('click', '#button-side-form', function() {
+            window.location.href = `${APP_URL}/admin/add-product`;
+        });
+
         $(document).on('click', '.button-delete', function(e) {
             e.preventDefault();
             let url = `${APP_URL}/admin/delete-product/` + $(this).attr('data-uuid');
@@ -272,7 +317,7 @@
             control.ajaxDelete(url, label);
         });
 
-        // --- [PERBAIKAN] Event handler untuk tombol Bundle ---
+        // --- Event handler untuk tombol Bundle ---
         $(document).on('click', '.button-bundle', function(e) {
             e.preventDefault();
             let productUuid = $(this).data('uuid');
@@ -284,17 +329,16 @@
                 return;
             }
 
-            // 1. Buat URL fetch yang benar dengan mengganti placeholder :uuid
+            // Buat URL fetch yang benar dengan mengganti placeholder :uuid
             const fetchUrl = BUNDLE_GET_URL_TEMPLATE.replace(':uuid', productUuid);
 
-            // 2. Atur action form ke URL store yang sudah didefinisikan
+            // Atur action form ke URL store
             form.attr('action', BUNDLE_STORE_URL);
-
             $('#bundle_uuid').val(productUuid);
             $('#included_products').empty().append('<option value="">Memuat...</option>');
 
             $.ajax({
-                url: fetchUrl, // Gunakan URL yang sudah diperbaiki
+                url: fetchUrl,
                 type: 'GET',
                 timeout: 10000,
                 success: function(response) {
@@ -302,36 +346,43 @@
                     if (response.status === 'success') {
                         if (response.all_free_products && response.all_free_products.length > 0) {
                             response.all_free_products.forEach((product) => {
-                                let selected = response.selected_products.includes(product.uuid) ? 'selected' : '';
-                                $('#included_products').append(`<option value="${product.uuid}" ${selected}>${product.judul_product}</option>`);
+                                let selected = response.selected_products.includes(product
+                                    .uuid) ? 'selected' : '';
+                                $('#included_products').append(
+                                    `<option value="${product.uuid}" ${selected}>${product.judul_product}</option>`
+                                );
                             });
                         } else {
-                            $('#included_products').append('<option value="" disabled>Tidak ada produk free tersedia</option>');
+                            $('#included_products').append(
+                                '<option value="" disabled>Tidak ada produk free tersedia</option>');
                         }
                     } else {
-                         $('#included_products').append('<option value="" disabled>Gagal memuat data</option>');
-                         if (response.message) {
-                             Swal.fire('Informasi', response.message, 'info');
-                         }
+                        $('#included_products').append(
+                            '<option value="" disabled>Gagal memuat data</option>');
+                        if (response.message) {
+                            Swal.fire('Informasi', response.message, 'info');
+                        }
                     }
                     modal.modal('show');
                 },
                 error: function(xhr, status, error) {
-                    $('#included_products').empty().append('<option value="">Gagal memuat data</option>');
+                    $('#included_products').empty().append(
+                        '<option value="">Gagal memuat data</option>');
                     let errorMessage = 'Gagal memuat data produk bundle.';
                     if (xhr.status === 404) {
-                        errorMessage = 'Endpoint tidak ditemukan. Pastikan nama route `admin.product-bundle.get` sudah benar dan cache route sudah di-clear (coba jalankan `php artisan route:clear`).';
+                        errorMessage =
+                            'Endpoint tidak ditemukan. Pastikan route sudah benar dan cache sudah di-clear.';
                     }
                     Swal.fire('Error', errorMessage, 'error');
                 }
             });
         });
 
-        // --- [PERBAIKAN] Submit form Bundle ---
+        // --- Submit form Bundle ---
         $('#bundleForm').on('submit', function(e) {
             e.preventDefault();
             let form = $(this);
-            let url = form.attr('action'); // URL diambil dari atribut action yang sudah diatur dengan benar
+            let url = form.attr('action');
             let data = form.serialize();
             let saveBtn = $('#saveBundleBtn');
 
@@ -345,7 +396,13 @@
                 success: function(response) {
                     if (response.status === 'success') {
                         $('#modalBundle').modal('hide');
-                        Swal.fire({ icon: 'success', title: 'Berhasil!', text: response.message, showConfirmButton: false, timer: 2000 });
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil!',
+                            text: response.message,
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
                         $('#kt_table_data').DataTable().ajax.reload();
                     } else {
                         Swal.fire('Gagal!', response.message || 'Terjadi kesalahan.', 'error');
@@ -361,11 +418,13 @@
                     Swal.fire('Gagal!', errorMessage, 'error');
                 },
                 complete: function() {
-                    saveBtn.prop('disabled', false).html('<i class="fa fa-save me-1"></i>Simpan Bundle');
+                    saveBtn.prop('disabled', false).html(
+                    '<i class="fa fa-save me-1"></i>Simpan Bundle');
                 }
             });
         });
 
+        // --- Document ready ---
         $(function() {
             initDatatable();
         });
