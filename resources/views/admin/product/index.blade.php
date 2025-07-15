@@ -133,7 +133,7 @@
             const updateUrl = (discountUuid) => `${APP_URL}/admin/diskon-produk/update/${discountUuid}`;
 
             $.ajax({
-                url: checkUrl, // URL yang sudah diperbaiki
+                url: checkUrl,
                 type: 'GET',
                 success: function(response) {
                     $('#product_uuid').val(productUuid);
@@ -144,9 +144,6 @@
                         form.attr('action', updateUrl(response.discount_data.uuid));
                         form.prepend('<input type="hidden" name="_method" value="PUT">');
                         $('#diskon_persen').val(response.discount_data.diskon_persen);
-
-                        // Pastikan format tanggal dari server sesuai untuk datetime-local
-                        // Format yang dibutuhkan: YYYY-MM-DDTHH:mm
                         let tgl = response.discount_data.akhir_tanggal;
                         // Jika formatnya 'YYYY-MM-DD HH:mm:ss', ubah menjadi 'YYYY-MM-DDTHH:mm'
                         if (tgl && tgl.includes(' ')) {
@@ -161,10 +158,6 @@
                         form[0].reset();
                         $('#product_uuid').val(productUuid);
                     }
-
-                    // --- PERBAIKAN LOGIKA WAKTU ---
-                    // Kode ini akan membuat string waktu "saat ini" berdasarkan zona waktu Jakarta (WIB)
-                    // dan mengaturnya sebagai nilai minimum pada input tanggal.
                     const nowInJakarta = new Date(new Date().toLocaleString("en-US", {
                         timeZone: "Asia/Jakarta"
                     }));
@@ -311,9 +304,9 @@
                                     <i class="fa fa-percent"></i>
                                 </a>
                                 ${full.nama_kategori && full.nama_kategori.toLowerCase().trim() === 'bundle' ? `
-                                <a href="javascript:;" type="button" data-uuid="${data}" class="btn btn-info button-bundle btn-icon btn-sm" title="Atur Bundle">
-                                    <i class="fa fa-box"></i>
-                                </a>` : ''}
+                                        <a href="javascript:;" type="button" data-uuid="${data}" class="btn btn-info button-bundle btn-icon btn-sm" title="Atur Bundle">
+                                            <i class="fa fa-box"></i>
+                                        </a>` : ''}
                             </div>
                         `;
                     },
@@ -431,66 +424,67 @@
 
         // Submit form Bundle - Improved Version
         $('#bundleForm').on('submit', function(e) {
-                    e.preventDefault();
-                    let form = $(this);
-                    let url = form.attr('action');
-                    let data = form.serialize();
-                    let saveBtn = $('#saveBundleBtn');
+            e.preventDefault();
+            let form = $(this);
+            let url = form.attr('action');
+            let data = form.serialize();
+            let saveBtn = $('#saveBundleBtn');
 
-                    console.log('Bundle form submitted');
-                    console.log('Form data:', data);
-                    console.log('Submit URL:', url);
+            console.log('Bundle form submitted');
+            console.log('Form data:', data);
+            console.log('Submit URL:', url);
 
-                    saveBtn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin me-1"></i>Menyimpan...');
+            saveBtn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin me-1"></i>Menyimpan...');
 
-                    $.ajax({
-                        url: url,
-                        type: 'POST',
-                        data: data,
-                        timeout: 10000,
-                        success: function(response) {
-                            console.log('Bundle save response:', response);
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: data,
+                timeout: 10000,
+                success: function(response) {
+                    console.log('Bundle save response:', response);
 
-                            if (response.status === 'success') {
-                                $('#modalBundle').modal('hide');
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Berhasil!',
-                                    text: response.message,
-                                    showConfirmButton: false,
-                                    timer: 2000
-                                });
-                                $('#kt_table_data').DataTable().ajax.reload();
-                            } else {
-                                Swal.fire('Gagal!', response.message || 'Terjadi kesalahan.', 'error');
-                            }
-                        },
-                        error: function(xhr, status, error) {
-                            console.error("Bundle Save Error:");
-                            console.error("Status:", status);
-                            console.error("Error:", error);
-                            console.error("Response:", xhr.responseText);
+                    if (response.status === 'success') {
+                        $('#modalBundle').modal('hide');
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil!',
+                            text: response.message,
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+                        $('#kt_table_data').DataTable().ajax.reload();
+                    } else {
+                        Swal.fire('Gagal!', response.message || 'Terjadi kesalahan.', 'error');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("Bundle Save Error:");
+                    console.error("Status:", status);
+                    console.error("Error:", error);
+                    console.error("Response:", xhr.responseText);
 
-                            let errorMessage = 'Terjadi kesalahan saat menyimpan.';
+                    let errorMessage = 'Terjadi kesalahan saat menyimpan.';
 
-                            if (xhr.responseJSON && xhr.responseJSON.message) {
-                                errorMessage = xhr.responseJSON.message;
-                            } else if (xhr.responseJSON && xhr.responseJSON.errors) {
-                                // Handle validation errors
-                                let errors = xhr.responseJSON.errors;
-                                errorMessage = Object.values(errors).flat().join(', ');
-                            }
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMessage = xhr.responseJSON.message;
+                    } else if (xhr.responseJSON && xhr.responseJSON.errors) {
+                        // Handle validation errors
+                        let errors = xhr.responseJSON.errors;
+                        errorMessage = Object.values(errors).flat().join(', ');
+                    }
 
-                            Swal.fire('Gagal!', errorMessage, 'error');
-                        },
-                        complete: function() {
-                            saveBtn.prop('disabled', false).html(
-                                '<i class="fa fa-save me-1"></i>Simpan Bundle');
-                        }
-                    });
+                    Swal.fire('Gagal!', errorMessage, 'error');
+                },
+                complete: function() {
+                    saveBtn.prop('disabled', false).html(
+                        '<i class="fa fa-save me-1"></i>Simpan Bundle');
+                }
+            });
+        });
 
-                    $(function() {
-                        initDatatable();
-                    });
+        $(function() {
+            initDatatable();
+        });
     </script>
 @endsection
