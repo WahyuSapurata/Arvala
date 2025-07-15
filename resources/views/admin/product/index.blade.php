@@ -111,12 +111,11 @@
 @section('script')
     <script>
         // Definisikan base URL aplikasi menggunakan helper Laravel.
-        // Ini akan menghasilkan URL yang benar baik di lokal maupun di hosting.
         const APP_URL = "{{ url('/') }}";
 
         let control = new Control();
 
-        // --- Event handler untuk tombol diskon (Logika Diperbarui) ---
+        // --- Event handler untuk tombol diskon (Fixed URLs) ---
         $(document).on('click', '.button-discount', function(e) {
             e.preventDefault();
             let productUuid = $(this).data('uuid');
@@ -125,9 +124,9 @@
             let modalTitle = $('#modalDiskonLabel');
             let saveBtn = $('#saveDiscountBtn');
 
-            form.find('input[name="_method"]').remove(); // Hapus method spoofing lama jika ada
+            form.find('input[name="_method"]').remove();
 
-            // Gunakan APP_URL yang sudah kita definisikan untuk membuat URL AJAX yang dinamis
+            // Fixed URLs to match route definitions
             const checkUrl = `${APP_URL}/admin/diskon-produk/check/${productUuid}`;
             const storeUrl = `${APP_URL}/admin/diskon-produk/store`;
             const updateUrl = (discountUuid) => `${APP_URL}/admin/diskon-produk/update/${discountUuid}`;
@@ -145,12 +144,10 @@
                         form.prepend('<input type="hidden" name="_method" value="PUT">');
                         $('#diskon_persen').val(response.discount_data.diskon_persen);
                         let tgl = response.discount_data.akhir_tanggal;
-                        // Jika formatnya 'YYYY-MM-DD HH:mm:ss', ubah menjadi 'YYYY-MM-DDTHH:mm'
                         if (tgl && tgl.includes(' ')) {
                             tgl = tgl.substring(0, 16).replace(' ', 'T');
                         }
                         $('#akhir_tanggal').val(tgl);
-
                     } else {
                         modalTitle.text('Tambah Diskon Produk');
                         saveBtn.html('<i class="fa fa-save me-1"></i>Simpan Diskon');
@@ -158,11 +155,12 @@
                         form[0].reset();
                         $('#product_uuid').val(productUuid);
                     }
+
+                    // Set minimum date to current Jakarta time
                     const nowInJakarta = new Date(new Date().toLocaleString("en-US", {
                         timeZone: "Asia/Jakarta"
                     }));
 
-                    // Format tanggal ke dalam YYYY-MM-DDTHH:mm yang dibutuhkan oleh input datetime-local
                     const year = nowInJakarta.getFullYear();
                     const month = String(nowInJakarta.getMonth() + 1).padStart(2, '0');
                     const day = String(nowInJakarta.getDate()).padStart(2, '0');
@@ -170,14 +168,12 @@
                     const minutes = String(nowInJakarta.getMinutes()).padStart(2, '0');
 
                     const jakartaMinTime = `${year}-${month}-${day}T${hours}:${minutes}`;
-
                     $('#akhir_tanggal').attr('min', jakartaMinTime);
-                    // -------------------------------------------------------------------------
 
                     modal.modal('show');
                 },
-                error: function(xhr) { // Tambahkan xhr untuk melihat detail error
-                    console.error("AJAX Error:", xhr.status, xhr.responseText); // Log error ke console
+                error: function(xhr) {
+                    console.error("AJAX Error:", xhr.status, xhr.responseText);
                     Swal.fire('Error',
                         'Gagal mengecek status diskon produk. Cek console browser untuk detail.',
                         'error');
@@ -185,12 +181,11 @@
             });
         });
 
-        // --- Event handler untuk submit form ---
+        // --- Event handler untuk submit form diskon ---
         $('#discountForm').on('submit', function(e) {
             e.preventDefault();
             let form = $(this);
-            let url = form.attr('action'); // URL sudah di-set dengan benar sebelumnya
-            // Method POST selalu digunakan karena kita memakai _method:PUT untuk update
+            let url = form.attr('action');
             let method = 'POST';
             let data = form.serialize();
             let saveBtn = $('#saveDiscountBtn');
@@ -224,7 +219,6 @@
                     Swal.fire('Gagal!', errorMessage, 'error');
                 },
                 complete: function() {
-                    // Cek title modal untuk menentukan teks tombol
                     let originalButtonText = $('#modalDiskonLabel').text().includes('Edit') ?
                         'Update Diskon' : 'Simpan Diskon';
                     saveBtn.prop('disabled', false).html(
@@ -233,7 +227,7 @@
             });
         });
 
-        // --- Sisa Script Anda (Tidak ada perubahan signifikan) ---
+        // --- Other event handlers ---
         $(document).on('click', '#button-side-form', function() {
             window.location.href = `${APP_URL}/admin/add-product`;
         });
@@ -256,7 +250,7 @@
                     [0, 'asc']
                 ],
                 processing: true,
-                ajax: `${APP_URL}/admin/get-product`, // Perbaiki URL di sini juga
+                ajax: `${APP_URL}/admin/get-product`,
                 columns: [{
                         data: null,
                         render: (data, type, row, meta) => meta.row + meta.settings._iDisplayStart + 1
@@ -290,31 +284,30 @@
                     orderable: false,
                     className: 'text-center',
                     render: function(data, type, full, meta) {
-
                         const editUrl = `${APP_URL}/admin/edit-product/${data}`;
                         return `
-                            <div class="d-flex gap-2" style="flex-flow: wrap;">
-                                <a href="${editUrl}" class="btn btn-warning btn-icon btn-sm" title="Edit Produk">
-                                    <i class="fa fa-edit"></i>
-                                </a>
-                                <a href="javascript:;" type="button" data-uuid="${data}" data-label="Product" class="btn btn-danger button-delete btn-icon btn-sm" title="Hapus Produk">
-                                    <i class="fa fa-trash"></i>
-                                </a>
-                                <a href="javascript:;" type="button" data-uuid="${data}" class="btn btn-success button-discount btn-icon btn-sm" title="Atur Diskon">
-                                    <i class="fa fa-percent"></i>
-                                </a>
-                                ${full.nama_kategori && full.nama_kategori.toLowerCase().trim() === 'bundle' ? `
-                                                <a href="javascript:;" type="button" data-uuid="${data}" class="btn btn-info button-bundle btn-icon btn-sm" title="Atur Bundle">
-                                                    <i class="fa fa-box"></i>
-                                                </a>` : ''}
-                            </div>
-                        `;
+                        <div class="d-flex gap-2" style="flex-flow: wrap;">
+                            <a href="${editUrl}" class="btn btn-warning btn-icon btn-sm" title="Edit Produk">
+                                <i class="fa fa-edit"></i>
+                            </a>
+                            <a href="javascript:;" type="button" data-uuid="${data}" data-label="Product" class="btn btn-danger button-delete btn-icon btn-sm" title="Hapus Produk">
+                                <i class="fa fa-trash"></i>
+                            </a>
+                            <a href="javascript:;" type="button" data-uuid="${data}" class="btn btn-success button-discount btn-icon btn-sm" title="Atur Diskon">
+                                <i class="fa fa-percent"></i>
+                            </a>
+                            ${full.nama_kategori && full.nama_kategori.toLowerCase().trim() === 'bundle' ? `
+                                    <a href="javascript:;" type="button" data-uuid="${data}" class="btn btn-info button-bundle btn-icon btn-sm" title="Atur Bundle">
+                                        <i class="fa fa-box"></i>
+                                    </a>` : ''}
+                        </div>
+                    `;
                     },
                 }],
             });
         };
 
-        // Event handler tombol Atur Bundle - Improved Version
+        // --- Event handler untuk tombol Bundle (Fixed URLs) ---
         $(document).on('click', '.button-bundle', function(e) {
             e.preventDefault();
             let productUuid = $(this).data('uuid');
@@ -333,10 +326,9 @@
             $('#bundle_uuid').val(productUuid);
             $('#included_products').empty();
 
-            // Perbaikan di sini: hilangkan '/public' jika ada
-            const BASE_URL = APP_URL.replace('/public', '');
-            const fetchUrl = `${BASE_URL}/admin/product-bundle/get/${productUuid}`;
-            const saveUrl = `${BASE_URL}/admin/product-bundle/store`;
+            // Fixed URLs to match route definitions
+            const fetchUrl = `${APP_URL}/admin/product-bundle/get/${productUuid}`;
+            const saveUrl = `${APP_URL}/admin/product-bundle/store`;
 
             console.log('Fetch URL:', fetchUrl);
 
@@ -420,8 +412,7 @@
             });
         });
 
-
-        // Submit form Bundle - Improved Version
+        // --- Submit form Bundle ---
         $('#bundleForm').on('submit', function(e) {
             e.preventDefault();
             let form = $(this);
@@ -468,7 +459,6 @@
                     if (xhr.responseJSON && xhr.responseJSON.message) {
                         errorMessage = xhr.responseJSON.message;
                     } else if (xhr.responseJSON && xhr.responseJSON.errors) {
-                        // Handle validation errors
                         let errors = xhr.responseJSON.errors;
                         errorMessage = Object.values(errors).flat().join(', ');
                     }
