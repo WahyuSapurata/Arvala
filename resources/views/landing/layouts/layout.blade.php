@@ -6,6 +6,20 @@
     <base href="">
     <title>{{ config('app.name') }} | {{ $module }}</title>
     <meta charset="utf-8" />
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6V25RYMNJE"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'G-6V25RYMNJE');
+    </script>
+
     <!-- SEO Meta Tags -->
     <meta name="description"
         content="Arvala is a high-quality product mockup template designed for creators and entrepreneurs to showcase and sell digital goods with a professional touch.">

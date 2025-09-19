@@ -28,6 +28,8 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
 
     Route::get('/lisensi', 'Landing@lisensi')->name('lisensi');
 
+    Route::get('/term', 'Landing@Term')->name('term');
+
     Route::group(['prefix' => 'login', 'middleware' => ['guest'], 'as' => 'login.'], function () {
         Route::get('/login-akun', 'Auth@show')->name('login-akun');
         Route::post('/login-proses', 'Auth@login_proses')->name('login-proses');

@@ -199,4 +199,10 @@ class Landing extends BaseController
         $module = 'Lisensi';
         return view('landing.lisensi.index', compact('module'));
     }
+
+    public function term()
+    {
+        $module = 'Term';
+        return view('landing.term.index', compact('module'));
+    }
 }
