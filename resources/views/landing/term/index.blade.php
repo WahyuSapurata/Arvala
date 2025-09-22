@@ -12,7 +12,7 @@
             </div>
 
             <div class="row mt-20">
-                <div class="col-12 col-md-6 sm:mb-5">
+                <div class="col-12 col-md-6 mb-5">
                     <div class="accordion d-grid gap-5" id="accordionLeft">
                         <!-- Copyright & Ownership -->
                         <div class="accordion-item">
@@ -101,7 +101,7 @@
                     </div>
                 </div>
 
-                <div class="col-12 col-md-6 sm:mb-5">
+                <div class="col-12 col-md-6 mb-5">
                     <div class="accordion d-grid gap-5" id="accordionRight">
                         <!-- Refund Policy -->
                         <div class="accordion-item">
