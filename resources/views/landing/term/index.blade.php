@@ -12,8 +12,7 @@
             </div>
 
             <div class="row mt-20">
-                <!-- ================== KIRI ================== -->
-                <div class="col-12 col-md-6">
+                <div class="col-12 col-md-6 sm:mb-5">
                     <div class="accordion d-grid gap-5" id="accordionLeft">
                         <!-- Copyright & Ownership -->
                         <div class="accordion-item">
@@ -102,8 +101,7 @@
                     </div>
                 </div>
 
-                <!-- ================== KANAN ================== -->
-                <div class="col-12 col-md-6">
+                <div class="col-12 col-md-6 sm:mb-5">
                     <div class="accordion d-grid gap-5" id="accordionRight">
                         <!-- Refund Policy -->
                         <div class="accordion-item">
@@ -172,7 +170,6 @@
                         </div>
                     </div>
                 </div>
-                <!-- ================== END KANAN ================== -->
             </div>
         </div>
         <!--end::Container-->

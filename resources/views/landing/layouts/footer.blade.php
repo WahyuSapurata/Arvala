@@ -34,7 +34,7 @@
                                 Information</a>
                             <!--end::Link-->
                             <!--begin::Link-->
-                            <a href="" class="text-hover-primary fs-5 mb-6" style="color: #585858">Terms &
+                            <a href="{{ route('term') }}" class="text-hover-primary fs-5 mb-6" style="color: #585858">Terms &
                                 Conditions</a>
                             <!--end::Link-->
                         </div>
