@@ -266,7 +266,6 @@
                     dz.emit("thumbnail", mockFile, `${storagePath}/${filename}`);
                     dz.emit("complete", mockFile);
 
-                    // Tambah hidden input agar terkirim
                     const hiddenInput = document.createElement('input');
                     hiddenInput.type = 'hidden';
                     hiddenInput.name = 'existing_image_product[]';
@@ -275,7 +274,7 @@
                     mockFile._isExisting = true;
 
                     $(mockFile.previewElement).find('.dz-remove').on('click', function() {
-                        deletedImages.push(filename); // Tandai untuk dihapus
+                        deletedImages.push(filename);
                         dz.removeFile(mockFile);
                     });
                 });
@@ -285,12 +284,9 @@
                 });
 
                 dz.on("removedfile", function(file) {
-                    // Untuk file baru, tidak perlu aksi tambahan (tidak dikirim)
                     if (!file._isExisting) {
                         return;
                     }
-
-                    // Jika input hidden ada, hapus
                     const hidden = file.previewElement.querySelector(
                         'input[name="existing_image_product[]"]');
                     if (hidden) {
@@ -312,7 +308,7 @@
 
             if (selectedCategory && selectedCategory.nama_kategori.toLowerCase() === 'free') {
                 $('#price').prop('disabled', true); // Disable price field
-                $('#price').val('$0'); // Set price value to 0 with format
+                $('#price').val('$0.00'); // Set price value to 0 with format
             } else {
                 $('#price').prop('disabled', false); // Enable price field
             }
@@ -327,28 +323,35 @@
         // Submit form
         $(document).on('submit', ".form-data", function(e) {
             e.preventDefault();
+            console.log("Form submission initiated."); // For debugging
+
+            // Disable button and show loading spinner
+            const submitButton = $(this).find('.btn-submit');
+            submitButton.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Menyimpan...');
 
             const form = $(".form-data")[0];
             const formData = new FormData(form);
 
-            // Check if category is free, set price to 0 or remove price field
+            // Check if category is free, set price to 0
             const selectedUuid = $('#from_select_kategori').val();
             const selectedCategory = categoryData.find(cat => cat.uuid === selectedUuid);
             if (selectedCategory && selectedCategory.nama_kategori.toLowerCase() === 'free') {
                 formData.set('price', '0'); // Set price to 0 for free products
             }
 
-            // Tambah file baru dari Dropzone
+            // Add new files from Dropzone
             myDropzone.files.forEach(file => {
                 if (!file._isExisting) {
                     formData.append("image_product[]", file);
                 }
             });
 
-            // Kirim data gambar yang dihapus
+            // Send data of deleted images
             deletedImages.forEach(filename => {
                 formData.append("deleted_images[]", filename);
             });
+            console.log("FormData prepared, sending AJAX request."); // For debugging
+
 
             $.ajaxSetup({
                 headers: {
@@ -389,6 +392,10 @@
                         $(`.${key}_error`).html(value);
                     });
                 },
+                complete: function() {
+                    // Re-enable the button regardless of success or error
+                    submitButton.prop('disabled', false).html('<i class="bi bi-file-earmark-diff"></i> Simpan');
+                }
             });
         });
 
@@ -424,9 +431,7 @@
         $(function() {
             push_select_kategori();
         });
-    </script>
 
-    <script>
         $(document).ready(function() {
             $('.drop-zone').each(function() {
                 let dropZone = $(this);

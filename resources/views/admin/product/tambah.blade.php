@@ -223,7 +223,7 @@
 
             if (selectedCategory && selectedCategory.nama_kategori.toLowerCase() === 'free') {
                 $('#price').prop('disabled', true); // Disable price field
-                $('#price').val('$0'); // Set price value to 0
+                $('#price').val('$0.00'); // Set price value to 0
             } else {
                 $('#price').prop('disabled', false); // Enable price field
             }
@@ -237,21 +237,31 @@
 
         $(document).on('submit', ".form-data", function(e) {
             e.preventDefault();
+            console.log("Form submission initiated."); // For debugging
+
+            // Disable button and show loading spinner
+            const submitButton = $(this).find('.btn-submit');
+            submitButton.prop('disabled', true).html(
+                '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Menyimpan...'
+                );
+
 
             let form = $(this)[0];
             let formData = new FormData(form);
 
-            // Check if category is free, set price to 0 or remove price field
+            // Check if category is free, set price to 0
             const selectedUuid = $('#from_select_kategori').val();
             const selectedCategory = categoryData.find(cat => cat.uuid === selectedUuid);
             if (selectedCategory && selectedCategory.nama_kategori.toLowerCase() === 'free') {
                 formData.set('price', '0'); // Set price to 0 for free products
             }
 
-            // Append file dari Dropzone ke FormData
+            // Append files from Dropzone to FormData
             dropzone.getAcceptedFiles().forEach((file, i) => {
                 formData.append("image_product[]", file);
             });
+            console.log("FormData prepared, sending AJAX request."); // For debugging
+
 
             $.ajaxSetup({
                 headers: {
@@ -279,11 +289,7 @@
                                 window.location.href = '/admin/product';
                             });
                     } else {
-                        $("form")[0].reset();
-                        dropzone.removeAllFiles();
-                        $("#from_select_kategori").val(null).trigger("change");
-                        // Reset price field visibility
-                        $('.mb-10').has('#price').show();
+                        // Don't reset form, so user can correct errors
                         swal.fire({
                             title: response.message,
                             text: response.data,
@@ -299,6 +305,11 @@
                         $(`.${key}_error`).html(value);
                     });
                 },
+                complete: function() {
+                    // Re-enable the button regardless of success or error
+                    submitButton.prop('disabled', false).html(
+                        '<i class="bi bi-file-earmark-diff"></i> Simpan');
+                }
             });
         });
 
@@ -318,7 +329,7 @@
                     $('#from_select_kategori').html(html);
                 },
                 error: function(xhr) {
-                    alert("gagal");
+                    alert("Gagal mengambil data kategori.");
                 },
             });
         }
@@ -326,9 +337,7 @@
         $(function() {
             push_select_kategori();
         });
-    </script>
 
-    <script>
         $(document).ready(function() {
             $('.drop-zone').each(function() {
                 let dropZone = $(this);
