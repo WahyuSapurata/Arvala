@@ -219,7 +219,7 @@
         const deletedImages = [];
 
         const myDropzone = new Dropzone("#kt_dropzonejs_edit_product", {
-            url: "#",
+            url: "#", // This should be a real URL or prevented from submitting
             autoProcessQueue: false,
             uploadMultiple: true,
             parallelUploads: 10,
@@ -233,15 +233,16 @@
                 existingImages.forEach(function(filename) {
                     const mockFile = {
                         name: filename,
-                        size: 123456,
+                        size: 123456, // dummy size
                         accepted: true,
                         status: Dropzone.ADDED,
-                        type: 'image/jpeg',
+                        type: 'image/jpeg', // dummy type
                         _isExisting: true
                     };
                     dz.emit("addedfile", mockFile);
                     dz.emit("thumbnail", mockFile, `${storagePath}/${filename}`);
                     dz.emit("complete", mockFile);
+                    dz.files.push(mockFile); // Manually add to files array
                 });
 
                 this.on("removedfile", function(file) {
@@ -252,11 +253,29 @@
             }
         });
 
+        // Initialize SortableJS on the Dropzone container
         new Sortable(document.querySelector("#kt_dropzonejs_edit_product"), {
             items: ".dz-preview",
             ghostClass: "sortable-ghost",
             animation: 150,
+            onEnd: function(evt) {
+                // This function is triggered when sorting is finished
+                const orderedFiles = [];
+                const previews = document.querySelectorAll('#kt_dropzonejs_edit_product .dz-preview');
+
+                previews.forEach(preview => {
+                    // Find the corresponding file in myDropzone.files based on the element
+                    const file = myDropzone.files.find(f => f.previewElement === preview);
+                    if (file) {
+                        orderedFiles.push(file);
+                    }
+                });
+
+                // Replace the internal files array with the new sorted array
+                myDropzone.files = orderedFiles;
+            },
         });
+
 
         let categoryData = [];
 
@@ -287,15 +306,29 @@
                 formData.set('price', '0');
             }
 
-            myDropzone.files.forEach(file => {
-                if (!file._isExisting) formData.append("image_product[]", file);
-            });
+            // Handle deleted images
             deletedImages.forEach(filename => formData.append("deleted_images[]", filename));
-            document.querySelectorAll('#kt_dropzonejs_edit_product .dz-preview').forEach(previewEl => {
-                if (previewEl.dropzoneFile && previewEl.dropzoneFile._isExisting) {
-                    formData.append("ordered_existing_images[]", previewEl.dropzoneFile.name);
+
+            const orderedExistingImages = [];
+
+            // Now, iterate through the correctly ordered myDropzone.files array
+            myDropzone.files.forEach(file => {
+                if (file._isExisting) {
+                    // This is an existing file, add its name to the ordered list
+                    if (!deletedImages.includes(file.name)) {
+                        orderedExistingImages.push(file.name);
+                    }
+                } else {
+                    // This is a new file that needs to be uploaded
+                    formData.append("image_product[]", file);
                 }
             });
+
+            // Append the correctly ordered existing images to formData
+            orderedExistingImages.forEach(filename => {
+                formData.append("ordered_existing_images[]", filename);
+            });
+
 
             $.ajaxSetup({
                 headers: {
