@@ -23,9 +23,7 @@ class ProductController extends BaseController
         $data = Product::all();
         $data->map(function ($item) {
             $kategori = Kategori::where('uuid', $item->uuid_kategori)->first();
-
             $item->nama_kategori = $kategori->nama_kategori;
-
             return $item;
         });
         return $this->sendResponse($data, 'Get data success');
@@ -42,14 +40,12 @@ class ProductController extends BaseController
         $newThumbnail = '';
         $imageDetails = [];
 
-        // Simpan thumbnail
         if ($storeProductRequest->file('thumbnail')) {
             $extension = $storeProductRequest->file('thumbnail')->extension();
             $newThumbnail = 'thumbnail-' . now()->timestamp . '.' . $extension;
             $storeProductRequest->file('thumbnail')->storeAs('public/product-thumbnail', $newThumbnail);
         }
 
-        // Simpan detail gambar (multiple file)
         if ($storeProductRequest->hasFile('image_product')) {
             foreach ($storeProductRequest->file('image_product') as $index => $image) {
                 $extension = $image->extension();
@@ -59,10 +55,7 @@ class ProductController extends BaseController
             }
         }
 
-        // Untuk Kategory free
         $price = $storeProductRequest->price;
-
-        // Get category data to check if it's free
         $kategori = Kategori::where('uuid', $storeProductRequest->uuid_kategori)->first();
         if ($kategori && strtolower($kategori->nama_kategori) === 'free') {
             $price = 0;
@@ -76,7 +69,7 @@ class ProductController extends BaseController
             $data->thumbnail = $newThumbnail;
             $data->price = $price;
             $data->deskripsi = $storeProductRequest->deskripsi;
-            $data->image_product = json_encode($imageDetails); // simpan array ke kolom JSON
+            $data->image_product = json_encode($imageDetails);
             $data->meta = $storeProductRequest->meta;
             $data->link = $storeProductRequest->link;
             $data->save();
@@ -98,13 +91,11 @@ class ProductController extends BaseController
     {
         $product = Product::where('uuid', $params)->first();
 
-        // === HANDLE THUMBNAIL ===
         if ($updateProductRequest->hasFile('thumbnail')) {
-            $oldThumbnailPath = public_path('public/product-thumbnail/' . $product->thumbnail);
+            $oldThumbnailPath = public_path('storage/product-thumbnail/' . $product->thumbnail);
             if (File::exists($oldThumbnailPath)) {
                 File::delete($oldThumbnailPath);
             }
-
             $thumbnailFile = $updateProductRequest->file('thumbnail');
             $thumbnail = 'thumbnail-' . now()->timestamp . '.' . $thumbnailFile->extension();
             $thumbnailFile->storeAs('public/product-thumbnail', $thumbnail);
@@ -112,32 +103,27 @@ class ProductController extends BaseController
             $thumbnail = $product->thumbnail;
         }
 
-        $existingImages = json_decode($product->image_product, true) ?? [];
         $deletedImages = $updateProductRequest->deleted_images ?? [];
-        $newImages = [];
+        $orderedExistingImages = $updateProductRequest->ordered_existing_images ?? [];
+        $newlyUploadedFilenames = [];
 
-        // Simpan gambar lama yang tidak dihapus
-        foreach ($existingImages as $img) {
-            if (!in_array($img, $deletedImages)) {
-                $newImages[] = $img;
-            } else {
-                $oldPath = public_path('public/product-detail/' . $img);
-                if (File::exists($oldPath)) {
-                    File::delete($oldPath);
-                }
+        foreach ($deletedImages as $imgToDelete) {
+            $oldPath = public_path('storage/product-detail/' . $imgToDelete);
+            if (File::exists($oldPath)) {
+                File::delete($oldPath);
             }
         }
 
-        // Tambah file baru yang diupload
         if ($updateProductRequest->hasFile('image_product')) {
             foreach ($updateProductRequest->file('image_product') as $index => $file) {
                 $filename = 'image_' . $index . '-' . now()->timestamp . '.' . $file->extension();
                 $file->storeAs('public/product-detail', $filename);
-                $newImages[] = $filename;
+                $newlyUploadedFilenames[] = $filename;
             }
         }
 
-        // === SIMPAN SEMUA DATA ===
+        $finalImageArray = array_merge($orderedExistingImages, $newlyUploadedFilenames);
+
         try {
             $product->uuid_kategori = $updateProductRequest->uuid_kategori;
             $product->judul_product = $updateProductRequest->judul_product;
@@ -145,7 +131,7 @@ class ProductController extends BaseController
             $product->thumbnail = $thumbnail;
             $product->price = $updateProductRequest->price;
             $product->deskripsi = $updateProductRequest->deskripsi;
-            $product->image_product = json_encode($newImages);
+            $product->image_product = json_encode($finalImageArray);
             $product->meta = $updateProductRequest->meta;
             $product->link = $updateProductRequest->link;
             $product->save();
@@ -160,30 +146,23 @@ class ProductController extends BaseController
     {
         try {
             $product = Product::where('uuid', $params)->firstOrFail();
-
-            // Hapus semua diskon terkait produk ini
             DiskonProduk::where('uuid_produk', $product->uuid)->delete();
 
-            // Hapus thumbnail
-            $thumbnailPath = public_path('public/product-thumbnail/' . $product->thumbnail);
+            $thumbnailPath = public_path('storage/product-thumbnail/' . $product->thumbnail);
             if (File::exists($thumbnailPath)) {
                 File::delete($thumbnailPath);
             }
 
-            // Hapus semua gambar dari image_product (jika ada)
             $imageProductArray = json_decode($product->image_product, true);
             if (is_array($imageProductArray)) {
                 foreach ($imageProductArray as $imageFilename) {
-                    $imagePath = public_path('public/product-detail/' . $imageFilename);
+                    $imagePath = public_path('storage/product-detail/' . $imageFilename);
                     if (File::exists($imagePath)) {
                         File::delete($imagePath);
                     }
                 }
             }
-
-            // Hapus data produk
             $product->delete();
-
             return $this->sendResponse($product, 'Delete product success');
         } catch (\Exception $e) {
             return $this->sendError($e->getMessage(), $e->getMessage(), 400);

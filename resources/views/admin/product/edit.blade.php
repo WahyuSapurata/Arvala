@@ -1,14 +1,11 @@
 @extends('layouts.layout')
 @section('button')
     <div id="kt_toolbar_container" class="container-fluid d-flex flex-stack">
-        <!--begin::Page title-->
         <div data-kt-swapper="true" data-kt-swapper-mode="prepend"
             data-kt-swapper-parent="{default: '#kt_content_container', 'lg': '#kt_toolbar_container'}"
             class="page-title d-flex align-items-center flex-wrap me-3 mb-5 mb-lg-0">
-            <!--begin::Title-->
             <button class="btn btn-info btn-sm" id="button-side-form">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" id="svg-button"
-                    viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" id="svg-button" viewBox="0 0 512 512">
                     <style>
                         #svg-button {
                             fill: #ffffff
@@ -17,10 +14,9 @@
                     <path
                         d="M512 256A256 256 0 1 0 0 256a256 256 0 1 0 512 0zM217.4 376.9L117.5 269.8c-3.5-3.8-5.5-8.7-5.5-13.8s2-10.1 5.5-13.8l99.9-107.1c4.2-4.5 10.1-7.1 16.3-7.1c12.3 0 22.3 10 22.3 22.3l0 57.7 96 0c17.7 0 32 14.3 32 32l0 32c0 17.7-14.3 32-32 32l-96 0 0 57.7c0 12.3-10 22.3-22.3 22.3c-6.2 0-12.1-2.6-16.3-7.1z" />
                 </svg>
-                Kembali</button>
-            <!--end::Title-->
+                Kembali
+            </button>
         </div>
-        <!--end::Page title-->
     </div>
 @endsection
 @section('content')
@@ -78,24 +74,23 @@
             width: 100%;
             height: 100%;
             object-fit: contain;
-            /* atau 'cover' kalau mau isi penuh */
         }
 
         .dz-progress {
             display: none !important;
         }
+
+        .dz-preview.sortable-ghost {
+            opacity: 0.4;
+        }
     </style>
     <div class="post d-flex flex-column-fluid" id="kt_post">
-        <!--begin::Container-->
         <div id="kt_content_container" class="container">
             <div class="row">
-
                 <div class="card">
                     <div class="card-body p-0">
-                        <!--begin::Card body-->
                         <div class="card-body hover-scroll-overlay-y">
                             <form class="form-data" enctype="multipart/form-data">
-
                                 <input type="hidden" name="id" value="{{ $data->id }}">
                                 <input type="hidden" name="uuid" value="{{ $data->uuid }}">
 
@@ -110,8 +105,7 @@
                                     <label class="form-label">Kategori</label>
                                     <select name="uuid_kategori" class="form-select" data-control="select2"
                                         value="{{ $data->uuid_kategori }}" id="from_select_kategori"
-                                        data-placeholder="Pilih jenis inputan">
-                                    </select>
+                                        data-placeholder="Pilih jenis inputan"></select>
                                     <small class="text-danger uuid_kategori_error"></small>
                                 </div>
 
@@ -124,29 +118,24 @@
 
                                 <div class="mb-10">
                                     <label class="form-label">Deskripsi</label>
-                                    <textarea id="deskripsi" name="deskripsi" value="{{ $data->deskripsi }}">{{ $data->deskripsi }}</textarea>
+                                    <textarea id="deskripsi" name="deskripsi">{{ $data->deskripsi }}</textarea>
                                     <small class="text-danger deskripsi_error"></small>
                                 </div>
 
                                 <div class="mb-10">
-                                    <div>
-                                        <label for="thumbnail" class="form-label">Thumbnail</label>
-                                    </div>
+                                    <div><label for="thumbnail" class="form-label">Thumbnail</label></div>
                                     <div class="drop-zone" id="dropZoneThumbnail">
                                         <input type="file" class="file-input" name="thumbnail" accept="image/*">
                                         <p class="placeholder-text"
-                                            style="display: {{ $data->thumbnail ? 'none' : 'block' }};">
-                                            Drag & Drop an image here or click to select
-                                        </p>
+                                            style="display: {{ $data->thumbnail ? 'none' : 'block' }};">Drag & Drop an image
+                                            here or click to select</p>
                                         <img class="preview img-fluid shadow"
-                                            src="{{ asset('public/product-thumbnail/' . $data->thumbnail) }}"
+                                            src="{{ asset('storage/product-thumbnail/' . $data->thumbnail) }}"
                                             style="display: {{ $data->thumbnail ? 'block' : 'none' }};">
                                         <button type="button" class="remove-btn"
                                             style="display: {{ $data->thumbnail ? 'block' : 'none' }};">&times;</button>
                                     </div>
-                                    <div>
-                                        <small class="text-danger thumbnail_error"></small>
-                                    </div>
+                                    <div><small class="text-danger thumbnail_error"></small></div>
                                 </div>
 
                                 <div class="fv-row mb-10">
@@ -186,61 +175,51 @@
                                 </div>
                             </form>
                         </div>
-                        <!--end::Card body-->
                     </div>
                 </div>
-
             </div>
         </div>
-        <!--end::Container-->
     </div>
 @endsection
 @section('script')
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <script>
         let control = new Control();
-
         var currentPath = window.location.pathname;
         var pathParts = currentPath.split('/');
         var lastPart = pathParts[pathParts.length - 1];
 
-        var options = {
+        tinymce.init({
             selector: "#deskripsi",
             height: "480"
-        };
-        tinymce.init(options);
-
-        // Format price input (sama seperti form add)
-        $('#price').on('input', function() {
-            let value = $(this).val().replace(/[^0-9.]/g, ''); // Hanya angka dan titik
-            $(this).val(value); // Biarkan user memasukkan angka tanpa langsung format
         });
 
+        $('#price').on('input', function() {
+            $(this).val($(this).val().replace(/[^0-9.]/g, ''));
+        });
         $('#price').on('blur', function() {
             let value = $(this).val();
             let floatValue = parseFloat(value);
-
             if (!isNaN(floatValue)) {
                 $(this).val('$' + floatValue.toLocaleString('en-US', {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2
                 }));
             } else {
-                $(this).val(''); // Kosongkan jika input tidak valid
+                $(this).val('');
             }
         });
 
-        $(document).on('click', '#button-side-form', function() {
-            window.history.back();
-        })
+        $(document).on('click', '#button-side-form', () => window.history.back());
 
         Dropzone.autoDiscover = false;
 
         const existingImages = @json(json_decode($data->image_product ?? '[]'));
-        const storagePath = "{{ asset('public/product-detail') }}";
+        const storagePath = "{{ asset('storage/product-detail') }}";
         const deletedImages = [];
 
         const myDropzone = new Dropzone("#kt_dropzonejs_edit_product", {
-            url: "#", // dummy
+            url: "#",
             autoProcessQueue: false,
             uploadMultiple: true,
             parallelUploads: 10,
@@ -251,112 +230,77 @@
             addRemoveLinks: true,
             init: function() {
                 let dz = this;
-
-                // Preload existing images
                 existingImages.forEach(function(filename) {
                     const mockFile = {
                         name: filename,
                         size: 123456,
                         accepted: true,
                         status: Dropzone.ADDED,
-                        type: 'image/jpeg'
+                        type: 'image/jpeg',
+                        _isExisting: true
                     };
-
                     dz.emit("addedfile", mockFile);
                     dz.emit("thumbnail", mockFile, `${storagePath}/${filename}`);
                     dz.emit("complete", mockFile);
-
-                    const hiddenInput = document.createElement('input');
-                    hiddenInput.type = 'hidden';
-                    hiddenInput.name = 'existing_image_product[]';
-                    hiddenInput.value = filename;
-                    mockFile.previewElement.appendChild(hiddenInput);
-                    mockFile._isExisting = true;
-
-                    $(mockFile.previewElement).find('.dz-remove').on('click', function() {
-                        deletedImages.push(filename);
-                        dz.removeFile(mockFile);
-                    });
                 });
 
-                dz.on("addedfile", function(file) {
-                    file.previewElement.classList.add('dz-success', 'dz-complete');
-                });
-
-                dz.on("removedfile", function(file) {
-                    if (!file._isExisting) {
-                        return;
-                    }
-                    const hidden = file.previewElement.querySelector(
-                        'input[name="existing_image_product[]"]');
-                    if (hidden) {
-                        hidden.remove();
+                this.on("removedfile", function(file) {
+                    if (file._isExisting) {
+                        deletedImages.push(file.name);
                     }
                 });
             }
         });
 
-        // Variable to store category data
+        new Sortable(document.querySelector("#kt_dropzonejs_edit_product"), {
+            items: ".dz-preview",
+            ghostClass: "sortable-ghost",
+            animation: 150,
+        });
+
         let categoryData = [];
 
-        // Function to toggle price field visibility (sama seperti form add)
         function togglePriceField(selectedUuid) {
-            const priceContainer = $('.mb-10').has('#price');
-
-            // Find the selected category data
             const selectedCategory = categoryData.find(cat => cat.uuid === selectedUuid);
-
             if (selectedCategory && selectedCategory.nama_kategori.toLowerCase() === 'free') {
-                $('#price').prop('disabled', true); // Disable price field
-                $('#price').val('$0.00'); // Set price value to 0 with format
+                $('#price').prop('disabled', true).val('$0.00');
             } else {
-                $('#price').prop('disabled', false); // Enable price field
+                $('#price').prop('disabled', false);
             }
         }
 
-        // Add event listener for category selection change
         $(document).on('change', '#from_select_kategori', function() {
-            const selectedUuid = $(this).val();
-            togglePriceField(selectedUuid);
+            togglePriceField($(this).val());
         });
 
-        // Submit form
         $(document).on('submit', ".form-data", function(e) {
             e.preventDefault();
-            console.log("Form submission initiated."); // For debugging
-
-            // Disable button and show loading spinner
             const submitButton = $(this).find('.btn-submit');
-            submitButton.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Menyimpan...');
+            submitButton.prop('disabled', true).html(
+                '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Menyimpan...'
+            );
 
-            const form = $(".form-data")[0];
-            const formData = new FormData(form);
-
-            // Check if category is free, set price to 0
+            const formData = new FormData(this);
             const selectedUuid = $('#from_select_kategori').val();
             const selectedCategory = categoryData.find(cat => cat.uuid === selectedUuid);
             if (selectedCategory && selectedCategory.nama_kategori.toLowerCase() === 'free') {
-                formData.set('price', '0'); // Set price to 0 for free products
+                formData.set('price', '0');
             }
 
-            // Add new files from Dropzone
             myDropzone.files.forEach(file => {
-                if (!file._isExisting) {
-                    formData.append("image_product[]", file);
+                if (!file._isExisting) formData.append("image_product[]", file);
+            });
+            deletedImages.forEach(filename => formData.append("deleted_images[]", filename));
+            document.querySelectorAll('#kt_dropzonejs_edit_product .dz-preview').forEach(previewEl => {
+                if (previewEl.dropzoneFile && previewEl.dropzoneFile._isExisting) {
+                    formData.append("ordered_existing_images[]", previewEl.dropzoneFile.name);
                 }
             });
 
-            // Send data of deleted images
-            deletedImages.forEach(filename => {
-                formData.append("deleted_images[]", filename);
-            });
-            console.log("FormData prepared, sending AJAX request."); // For debugging
-
-
             $.ajaxSetup({
                 headers: {
-                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
-                },
+                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content")
+                }
             });
 
             $.ajax({
@@ -367,34 +311,31 @@
                 processData: false,
                 success: function(response) {
                     $(".text-danger").html("");
-                    if (response.success == true) {
+                    if (response.success) {
                         swal.fire({
-                            text: `Product berhasil di Edit`,
-                            icon: "success",
-                            showConfirmButton: false,
-                            timer: 1500,
-                        }).then(function() {
-                            window.location.href = '/admin/product';
-                        });
+                                text: `Product berhasil di Edit`,
+                                icon: "success",
+                                showConfirmButton: false,
+                                timer: 1500
+                            })
+                            .then(() => window.location.href = '/admin/product');
                     } else {
                         swal.fire({
                             title: response.message,
                             text: response.data,
                             icon: "warning",
                             showConfirmButton: false,
-                            timer: 1500,
+                            timer: 1500
                         });
                     }
                 },
                 error: function(xhr) {
                     $(".text-danger").html("");
-                    $.each(xhr.responseJSON["errors"], function(key, value) {
-                        $(`.${key}_error`).html(value);
-                    });
+                    $.each(xhr.responseJSON["errors"], (key, value) => $(`.${key}_error`).html(value));
                 },
                 complete: function() {
-                    // Re-enable the button regardless of success or error
-                    submitButton.prop('disabled', false).html('<i class="bi bi-file-earmark-diff"></i> Simpan');
+                    submitButton.prop('disabled', false).html(
+                        '<i class="bi bi-file-earmark-diff"></i> Simpan');
                 }
             });
         });
@@ -404,95 +345,21 @@
                 url: "{{ route('admin.kategori-get') }}",
                 method: "GET",
                 success: function(res) {
-                    // Store category data globally
                     categoryData = res.data;
-
-                    let html = "";
-                    let selectedKategori = @json($data->uuid_kategori);
-
-                    $.each(res.data, function(x, y) {
+                    let html = "",
+                        selectedKategori = @json($data->uuid_kategori);
+                    $.each(res.data, (x, y) => {
                         let selected = y.uuid == selectedKategori ? "selected" : "";
                         html += `<option value="${y.uuid}" ${selected}>${y.nama_kategori}</option>`;
                     });
-
                     $('#from_select_kategori').html(html);
-
-                    // Check initial category after loading
-                    if (selectedKategori) {
-                        togglePriceField(selectedKategori);
-                    }
+                    if (selectedKategori) togglePriceField(selectedKategori);
                 },
-                error: function(xhr) {
-                    alert("Gagal mengambil data kategori.");
-                },
+                error: () => alert("Gagal mengambil data kategori."),
             });
         }
-
         $(function() {
             push_select_kategori();
-        });
-
-        $(document).ready(function() {
-            $('.drop-zone').each(function() {
-                let dropZone = $(this);
-                let fileInput = dropZone.find('.file-input');
-                let preview = dropZone.find('.preview');
-                let placeholderText = dropZone.find('.placeholder-text');
-                let removeBtn = dropZone.find('.remove-btn');
-
-                dropZone.on('dragover', function(event) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    $(this).addClass('dragover');
-                });
-
-                dropZone.on('dragleave', function(event) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    $(this).removeClass('dragover');
-                });
-
-                dropZone.on('drop', function(event) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    $(this).removeClass('dragover');
-                    let files = event.originalEvent.dataTransfer.files;
-                    fileInput[0].files = files;
-                    handleFiles(files);
-                });
-
-                fileInput.on('change', function(event) {
-                    handleFiles(event.target.files);
-                });
-
-                removeBtn.on('click', function() {
-                    fileInput.val('');
-                    preview.hide().attr('src', '');
-                    placeholderText.show();
-                    removeBtn.hide();
-                });
-
-                function handleFiles(files) {
-                    if (files.length > 0) {
-                        let file = files[0];
-                        if (file.type.startsWith('image/')) {
-                            if (file.size > 2 * 1024 * 1024) {
-                                alert('File terlalu besar! Maksimal 2MB.');
-                                return;
-                            }
-                            let reader = new FileReader();
-                            reader.onload = function(event) {
-                                preview.attr('src', event.target.result).show();
-                                placeholderText.hide();
-                                removeBtn.show();
-                            };
-                            reader.readAsDataURL(file);
-                        } else {
-                            alert('Harap unggah file gambar yang valid.');
-                        }
-                    }
-                }
-            });
         });
     </script>
 @endsection
