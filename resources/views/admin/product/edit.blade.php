@@ -130,7 +130,7 @@
                                             style="display: {{ $data->thumbnail ? 'none' : 'block' }};">Drag & Drop an image
                                             here or click to select</p>
                                         <img class="preview img-fluid shadow"
-                                            src="{{ asset('storage/product-thumbnail/' . $data->thumbnail) }}"
+                                            src="{{ asset('public/product-thumbnail/' . $data->thumbnail) }}"
                                             style="display: {{ $data->thumbnail ? 'block' : 'none' }};">
                                         <button type="button" class="remove-btn"
                                             style="display: {{ $data->thumbnail ? 'block' : 'none' }};">&times;</button>
@@ -215,7 +215,7 @@
         Dropzone.autoDiscover = false;
 
         const existingImages = @json(json_decode($data->image_product ?? '[]'));
-        const storagePath = "{{ asset('storage/product-detail') }}";
+        const storagePath = "{{ asset('public/product-detail') }}";
         const deletedImages = [];
 
         const myDropzone = new Dropzone("#kt_dropzonejs_edit_product", {

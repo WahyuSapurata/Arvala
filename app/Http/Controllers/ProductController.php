@@ -92,7 +92,7 @@ class ProductController extends BaseController
         $product = Product::where('uuid', $params)->first();
 
         if ($updateProductRequest->hasFile('thumbnail')) {
-            $oldThumbnailPath = public_path('storage/product-thumbnail/' . $product->thumbnail);
+            $oldThumbnailPath = public_path('public/product-thumbnail/' . $product->thumbnail);
             if (File::exists($oldThumbnailPath)) {
                 File::delete($oldThumbnailPath);
             }
@@ -108,7 +108,7 @@ class ProductController extends BaseController
         $newlyUploadedFilenames = [];
 
         foreach ($deletedImages as $imgToDelete) {
-            $oldPath = public_path('storage/product-detail/' . $imgToDelete);
+            $oldPath = public_path('public/product-detail/' . $imgToDelete);
             if (File::exists($oldPath)) {
                 File::delete($oldPath);
             }
@@ -148,7 +148,7 @@ class ProductController extends BaseController
             $product = Product::where('uuid', $params)->firstOrFail();
             DiskonProduk::where('uuid_produk', $product->uuid)->delete();
 
-            $thumbnailPath = public_path('storage/product-thumbnail/' . $product->thumbnail);
+            $thumbnailPath = public_path('public/product-thumbnail/' . $product->thumbnail);
             if (File::exists($thumbnailPath)) {
                 File::delete($thumbnailPath);
             }
@@ -156,7 +156,7 @@ class ProductController extends BaseController
             $imageProductArray = json_decode($product->image_product, true);
             if (is_array($imageProductArray)) {
                 foreach ($imageProductArray as $imageFilename) {
-                    $imagePath = public_path('storage/product-detail/' . $imageFilename);
+                    $imagePath = public_path('public/product-detail/' . $imageFilename);
                     if (File::exists($imagePath)) {
                         File::delete($imagePath);
                     }
