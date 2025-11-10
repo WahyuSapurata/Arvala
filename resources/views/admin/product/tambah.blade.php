@@ -153,14 +153,24 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <script>
         let control = new Control();
+        let isFormDirty = false; // Lacak perubahan form
+
         tinymce.init({
             selector: "#deskripsi",
-            height: "480"
+            height: "480",
+            plugins: "link lists image code", // TAMBAHKAN INI: Mengaktifkan plugin link, daftar, gambar, dan kode
+            toolbar: "undo redo | formatselect | bold italic | alignleft aligncenter alignright | bullist numlist | link image | code", // TAMBAHKAN INI: Menampilkan tombol link di toolbar
+            setup: function(editor) {
+                editor.on('change', function() {
+                    isFormDirty = true; // Set 'dirty' saat konten TinyMCE berubah
+                });
+            }
         });
 
         $('#price').on('input', function() {
             let value = $(this).val().replace(/[^0-9.]/g, '');
             $(this).val(value);
+            isFormDirty = true; // Tambahkan pelacak
         });
 
         $('#price').on('blur', function() {
@@ -177,7 +187,30 @@
         });
 
         $(document).on('click', '#button-side-form', function() {
-            window.history.back();
+            if (isFormDirty) {
+                swal.fire({
+                    title: "Simpan Perubahan?",
+                    text: "Anda memiliki perubahan yang belum disimpan. Apakah Anda ingin menyimpannya?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Ya, Simpan",
+                    cancelButtonText: "Tidak, Kembali",
+                    reverseButtons: true,
+                    customClass: {
+                        confirmButton: "btn btn-success",
+                        cancelButton: "btn btn-light-primary"
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $('.form-data').submit(); // Trigger submit form
+                    } else if (result.dismiss === swal.DismissReason.cancel) {
+                        isFormDirty = false; // Reset flag
+                        window.history.back(); // Kembali
+                    }
+                });
+            } else {
+                window.history.back(); // Langsung kembali jika tidak ada perubahan
+            }
         });
 
         Dropzone.autoDiscover = false;
@@ -193,6 +226,11 @@
             paramName: "image_product[]",
             acceptedFiles: "image/*"
         });
+
+        // Lacak perubahan dropzone
+        dropzone.on("addedfile", (file) => isFormDirty = true);
+        dropzone.on("removedfile", (file) => isFormDirty = true);
+
 
         new Sortable(document.querySelector("#dropzone-image-product"), {
             items: ".dz-preview",
@@ -213,6 +251,7 @@
 
         $(document).on('change', '#from_select_kategori', function() {
             togglePriceField($(this).val());
+            isFormDirty = true; // Tambahkan pelacak
         });
 
         $(document).on('submit', ".form-data", function(e) {
@@ -246,6 +285,7 @@
                 success: function(response) {
                     $(".text-danger").html("");
                     if (response.success) {
+                        isFormDirty = false; // Reset flag setelah sukses
                         swal.fire({
                                 text: `Product berhasil di Tambah`,
                                 icon: "success",
@@ -290,13 +330,22 @@
 
         $(function() {
             push_select_kategori();
+
+            // Lacak perubahan input/text lain
+            $('.form-data input, .form-data select').on('input change', function() {
+                isFormDirty = true;
+            });
+
             $('.drop-zone').each(function() {
                 let dropZone = $(this),
                     fileInput = dropZone.find('.file-input'),
                     preview = dropZone.find('.preview'),
                     placeholderText = dropZone.find('.placeholder-text');
 
-                fileInput.on('change', e => handleFiles(e.target.files, preview, placeholderText));
+                fileInput.on('change', e => {
+                    handleFiles(e.target.files, preview, placeholderText);
+                    isFormDirty = true; // Tambahkan pelacak
+                });
                 dropZone.on('dragover', e => {
                     e.preventDefault();
                     e.stopPropagation();
@@ -314,6 +363,7 @@
                     let files = e.originalEvent.dataTransfer.files;
                     fileInput[0].files = files;
                     handleFiles(files, preview, placeholderText);
+                    isFormDirty = true; // Tambahkan pelacak
                 });
             });
 

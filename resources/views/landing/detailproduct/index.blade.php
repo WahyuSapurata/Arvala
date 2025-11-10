@@ -32,58 +32,10 @@
                         <h2 class="text-dark" id="how-it-works" data-kt-scroll-offset="{default: 100, lg: 150}">
                             {{ $data->judul_product }}</h2>
                         <div class="fs-lg-6">
-                            @php
-                                $main_description_text = null;
-                                $bundle_link = null;
-                                $is_external_link = false;
-
-                                if ($data->original_price == 0) {
-                                    $full_text = strip_tags($data->deskripsi);
-                                    $full_text = html_entity_decode($full_text);
-                                    $full_text = str_replace(['&nbsp;', "\xC2\xA0"], ' ', $full_text);
-                                    $full_text = trim($full_text);
-
-                                    $last_space_pos = strrpos($full_text, ' ');
-                                    $last_word = null;
-                                    $potential_description = null;
-
-                                    if ($last_space_pos !== false) {
-                                        $potential_description = substr($full_text, 0, $last_space_pos);
-                                        $last_word = substr($full_text, $last_space_pos + 1);
-                                    } else {
-                                        $potential_description = null;
-                                        $last_word = $full_text;
-                                    }
-
-                                    $is_http_link =
-                                        strpos($last_word, 'http://') === 0 || strpos($last_word, 'https://') === 0;
-
-                                    if ($is_http_link) {
-                                        $main_description_text = $potential_description;
-                                        $bundle_link = $last_word;
-                                        $is_external_link = true;
-                                    } else {
-                                        $main_description_text = $full_text;
-                                        $bundle_link = null;
-                                    }
-                                }
-                            @endphp
-
-                            @if ($data->original_price == 0)
-                                @if ($main_description_text)
-                                    <p>{!! nl2br(e($main_description_text)) !!}</p>
-                                @endif
-
-                                @if ($bundle_link)
-                                    <a href="{{ $bundle_link }}" class="text-primary fw-bolder mt-2"
-                                        @if ($is_external_link) target="_blank" @endif
-                                        style="text-decoration: underline;">
-                                        Lihat Bundle
-                                    </a>
-                                @endif
-                            @else
-                                {!! $data->deskripsi !!}
-                            @endif
+                            {{-- LOGIKA DIHAPUS DAN DISEDERHANAKAN --}}
+                            {{-- Kita hanya perlu merender HTML langsung dari editor --}}
+                            {!! $data->deskripsi !!}
+                            {{-- AKHIR DARI PERUBAHAN --}}
                         </div>
                         <div class="d-grid gap-2 mt-4">
                             @if ($data->has_discount)

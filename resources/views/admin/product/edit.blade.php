@@ -185,17 +185,32 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <script>
         let control = new Control();
+        let isFormDirty = false; // Lacak perubahan form
         var currentPath = window.location.pathname;
         var pathParts = currentPath.split('/');
         var lastPart = pathParts[pathParts.length - 1];
 
         tinymce.init({
             selector: "#deskripsi",
-            height: "480"
+            height: "480",
+            plugins: "link lists image code", // Ini akan mengaktifkan plugin link
+            toolbar: "undo redo | formatselect | bold italic | alignleft aligncenter alignright | bullist numlist | link image | code", // Ini akan menampilkan tombol link
+            setup: function(editor) {
+                editor.on('change', function() {
+                    isFormDirty = true; // Set 'dirty' saat konten TinyMCE berubah
+                });
+            }
         });
+
+        // Hapus init kedua untuk #deskripsi
+        // tinymce.init({
+        //     selector: "#deskripsi",
+        //     height: "480"
+        // });
 
         $('#price').on('input', function() {
             $(this).val($(this).val().replace(/[^0-9.]/g, ''));
+            isFormDirty = true; // Tambahkan pelacak
         });
         $('#price').on('blur', function() {
             let value = $(this).val();
@@ -210,7 +225,32 @@
             }
         });
 
-        $(document).on('click', '#button-side-form', () => window.history.back());
+        $(document).on('click', '#button-side-form', function() {
+            if (isFormDirty) {
+                swal.fire({
+                    title: "Simpan Perubahan?",
+                    text: "Anda memiliki perubahan yang belum disimpan. Apakah Anda ingin menyimpannya?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Ya, Simpan",
+                    cancelButtonText: "Tidak, Kembali",
+                    reverseButtons: true,
+                    customClass: {
+                        confirmButton: "btn btn-success",
+                        cancelButton: "btn btn-light-primary"
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $('.form-data').submit(); // Trigger submit form
+                    } else if (result.dismiss === swal.DismissReason.cancel) {
+                        isFormDirty = false; // Reset flag
+                        window.history.back(); // Kembali
+                    }
+                });
+            } else {
+                window.history.back(); // Langsung kembali jika tidak ada perubahan
+            }
+        });
 
         Dropzone.autoDiscover = false;
 
@@ -249,6 +289,13 @@
                     if (file._isExisting) {
                         deletedImages.push(file.name);
                     }
+                    isFormDirty = true; // Lacak penghapusan file
+                });
+
+                this.on("addedfile", function(file) {
+                    if (!file._isExisting) { // Hanya file baru yang dihitung
+                        isFormDirty = true; // Lacak penambahan file
+                    }
                 });
             }
         });
@@ -259,6 +306,7 @@
             ghostClass: "sortable-ghost",
             animation: 150,
             onEnd: function(evt) {
+                isFormDirty = true; // Lacak perubahan urutan
                 // This function is triggered when sorting is finished
                 const orderedFiles = [];
                 const previews = document.querySelectorAll('#kt_dropzonejs_edit_product .dz-preview');
@@ -290,6 +338,7 @@
 
         $(document).on('change', '#from_select_kategori', function() {
             togglePriceField($(this).val());
+            isFormDirty = true; // Lacak perubahan kategori
         });
 
         $(document).on('submit', ".form-data", function(e) {
@@ -345,6 +394,7 @@
                 success: function(response) {
                     $(".text-danger").html("");
                     if (response.success) {
+                        isFormDirty = false; // Reset flag setelah sukses
                         swal.fire({
                                 text: `Product berhasil di Edit`,
                                 icon: "success",
@@ -393,6 +443,76 @@
         }
         $(function() {
             push_select_kategori();
+
+            // Lacak perubahan input/text lain
+            $('.form-data input, .form-data select').on('input change', function() {
+                isFormDirty = true;
+            });
+
+            // --- TAMBAHKAN LOGIKA UNTUK THUMBNAIL DROP ZONE ---
+            let dropZone = $('#dropZoneThumbnail'),
+                fileInput = dropZone.find('.file-input'),
+                preview = dropZone.find('.preview'),
+                placeholderText = dropZone.find('.placeholder-text'),
+                removeBtn = dropZone.find('.remove-btn');
+
+            fileInput.on('change', e => {
+                handleFiles(e.target.files);
+                isFormDirty = true;
+            });
+            dropZone.on('dragover', e => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropZone.addClass('dragover');
+            });
+            dropZone.on('dragleave', e => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropZone.removeClass('dragover');
+            });
+            dropZone.on('drop', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                dropZone.removeClass('dragover');
+                let files = e.originalEvent.dataTransfer.files;
+                fileInput[0].files = files;
+                handleFiles(files);
+                isFormDirty = true;
+            });
+            removeBtn.on('click', function(e) {
+                e.stopPropagation(); // Hentikan event agar tidak trigger dropZone click
+                preview.attr('src', '').hide();
+                placeholderText.show();
+                removeBtn.hide();
+                fileInput.val(''); // Kosongkan file input
+                isFormDirty = true;
+
+                // Tambahkan input tersembunyi untuk menandai penghapusan thumbnail
+                if ($('input[name="remove_thumbnail"]').length === 0) {
+                    $('.form-data').append('<input type="hidden" name="remove_thumbnail" value="1">');
+                }
+            });
+
+            function handleFiles(files) {
+                if (files.length > 0) {
+                    let file = files[0];
+                    if (file.type.startsWith('image/')) {
+                        let reader = new FileReader();
+                        reader.onload = e => {
+                            preview.attr('src', e.target.result).show();
+                            placeholderText.hide();
+                            removeBtn.show();
+                            // Hapus input tersembunyi jika gambar baru ditambahkan
+                            $('input[name="remove_thumbnail"]').remove();
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        alert('Please upload a valid image file.');
+                    }
+                }
+            }
+            // --- AKHIR BLOK THUMBNAIL ---
+
         });
     </script>
 @endsection
