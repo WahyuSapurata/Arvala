@@ -28,13 +28,63 @@
                     </div>
                 </div>
                 <div class="col-12 col-lg-4 position-sticky h-100" style="top: 80px;">
-                    <div class="p-10 mb-3" style="background-color: #F2F4F7; border-radius: 32px">
+                    <div class="p-10 mb-3" style="background-color: #F2F47; border-radius: 32px">
                         <h2 class="text-dark" id="how-it-works" data-kt-scroll-offset="{default: 100, lg: 150}">
                             {{ $data->judul_product }}</h2>
                         <div class="fs-lg-6">
-                            {!! $data->deskripsi !!}
+                            @php
+                                $main_description_text = null;
+                                $bundle_link = null;
+                                $is_external_link = false;
+
+                                if ($data->original_price == 0) {
+                                    $full_text = strip_tags($data->deskripsi);
+                                    $full_text = html_entity_decode($full_text);
+                                    $full_text = str_replace(['&nbsp;', "\xC2\xA0"], ' ', $full_text);
+                                    $full_text = trim($full_text);
+
+                                    $last_space_pos = strrpos($full_text, ' ');
+
+                                    if ($last_space_pos !== false) {
+                                        $main_description_text = substr($full_text, 0, $last_space_pos);
+                                        $bundle_link = substr($full_text, $last_space_pos + 1);
+                                    } else {
+                                        $main_description_text = null; // Tidak ada deskripsi
+                                        $bundle_link = $full_text;
+                                    }
+
+                                    $is_http_link =
+                                        strpos($bundle_link, 'http://') === 0 || strpos($bundle_link, 'https://') === 0;
+                                    $is_www_link = strpos($bundle_link, 'www.') === 0;
+                                    $is_external_link = $is_http_link || $is_www_link;
+
+                                    if ($is_www_link && !$is_http_link) {
+                                        $bundle_link = 'http://' . $bundle_link;
+                                    }
+                                }
+                            @endphp
+
+                            @if ($data->original_price == 0)
+                                {{-- Tampilkan bagian untuk produk GRATIS --}}
+
+                                @if ($main_description_text)
+                                    {{-- Tampilkan teks deskripsi (jika ada) --}}
+                                    <p>{{ $main_description_text }}</p>
+                                @endif
+
+                                @if ($bundle_link)
+                                    {{-- Tampilkan link "Lihat Bundle" sebagai teks (link biasa) --}}
+                                    <a href="{{ $bundle_link }}" class="text-primary fw-bolder mt-2"
+                                        @if ($is_external_link)  @endif style="text-decoration: underline;">
+                                        Lihat Bundle
+                                    </a>
+                                @endif
+                            @else
+                                {!! $data->deskripsi !!}
+                            @endif
+
                         </div>
-                        <div class="d-grid gap-2">
+                        <div class="d-grid gap-2 mt-4">
                             @if ($data->has_discount)
                                 <div class="d-flex flex-row align-items-center gap-2">
                                     <span class="text-muted text-decoration-line-through mb-1"
