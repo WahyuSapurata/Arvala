@@ -44,45 +44,46 @@
                                     $full_text = trim($full_text);
 
                                     $last_space_pos = strrpos($full_text, ' ');
+                                    $last_word = null;
+                                    $potential_description = null;
 
                                     if ($last_space_pos !== false) {
-                                        $main_description_text = substr($full_text, 0, $last_space_pos);
-                                        $bundle_link = substr($full_text, $last_space_pos + 1);
+                                        $potential_description = substr($full_text, 0, $last_space_pos);
+                                        $last_word = substr($full_text, $last_space_pos + 1);
                                     } else {
-                                        $main_description_text = null; // Tidak ada deskripsi
-                                        $bundle_link = $full_text;
+                                        $potential_description = null;
+                                        $last_word = $full_text;
                                     }
 
                                     $is_http_link =
-                                        strpos($bundle_link, 'http://') === 0 || strpos($bundle_link, 'https://') === 0;
-                                    $is_www_link = strpos($bundle_link, 'www.') === 0;
-                                    $is_external_link = $is_http_link || $is_www_link;
+                                        strpos($last_word, 'http://') === 0 || strpos($last_word, 'https://') === 0;
 
-                                    if ($is_www_link && !$is_http_link) {
-                                        $bundle_link = 'http://' . $bundle_link;
+                                    if ($is_http_link) {
+                                        $main_description_text = $potential_description;
+                                        $bundle_link = $last_word;
+                                        $is_external_link = true;
+                                    } else {
+                                        $main_description_text = $full_text;
+                                        $bundle_link = null;
                                     }
                                 }
                             @endphp
 
                             @if ($data->original_price == 0)
-                                {{-- Tampilkan bagian untuk produk GRATIS --}}
-
                                 @if ($main_description_text)
-                                    {{-- Tampilkan teks deskripsi (jika ada) --}}
-                                    <p>{{ $main_description_text }}</p>
+                                    <p>{!! nl2br(e($main_description_text)) !!}</p>
                                 @endif
 
                                 @if ($bundle_link)
-                                    {{-- Tampilkan link "Lihat Bundle" sebagai teks (link biasa) --}}
                                     <a href="{{ $bundle_link }}" class="text-primary fw-bolder mt-2"
-                                        @if ($is_external_link)  @endif style="text-decoration: underline;">
+                                        @if ($is_external_link) target="_blank" @endif
+                                        style="text-decoration: underline;">
                                         Lihat Bundle
                                     </a>
                                 @endif
                             @else
                                 {!! $data->deskripsi !!}
                             @endif
-
                         </div>
                         <div class="d-grid gap-2 mt-4">
                             @if ($data->has_discount)
